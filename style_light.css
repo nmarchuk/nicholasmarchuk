@@ -62,6 +62,7 @@ button {
 }
 
 .button.small {
+    color: black;
     font-size: 1rem;
     padding: 4px;
     margin: 8px 0px;
@@ -169,7 +170,7 @@ a:hover {
     margin: 20px auto 20px auto;
     padding: 2px 20px 20px 20px;
     background-color: #fff7e6;
-    overflow: scroll;
+    overflow: auto;
 }
 
 .head {
