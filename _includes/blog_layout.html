@@ -7,7 +7,8 @@
         <link id="style-dark" disabled rel="stylesheet" href="/style_dark.css" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=dark_mode" />
         <script src="/darkmode.js"></script>
-        <title>{{ title | default: " blog" }} | Nicholas Marchuk</title>
+        <title>{{ title | default: " blog" }} | Nicholas Marchuk | Author</title>
+        {% include "_mailerlite.html" %}
     </head>
     <body>
         <div class="head">
@@ -37,6 +38,12 @@
             </div>
             {% include "_blurb.html" %}
             <em><u><a href="/books/">learn more...</a></u></em>
+        </div>
+        <div class="container">
+            <div class="flex_lr">
+                <div class="ml-embedded" data-form="a6zzhd"></div>
+                <p class="smallpp"><b>Subscribe to read the first three chapters of my book for free!</b></p>
+            </div>
         </div>
         {% endif %}
         <div class="container">

@@ -54,6 +54,7 @@ button {
     background-color: transparent;
     font-size: 1rem;
     font-family: "Jetbrains Mono";
+    -webkit-appearance: none;
 }
 
 .button.inline {
@@ -94,6 +95,14 @@ button {
     align-items: center;
     height: fit-content;
     flex-wrap: wrap;
+}
+
+.smallpp {
+    width: 30%;
+}
+
+.ml-embedded {
+    padding: 10px 20px;
 }
 
 .image_box {
