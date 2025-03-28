@@ -31,7 +31,7 @@
         </div>
         {% if tags contains "splash" %}
         <div class="container">
-            <h1><a href="/books/">preorder my new book!</a></h1>
+            <h1><a href="/books/">new book coming soon!</a></h1>
             <div class="image_box">
                 <img class="img-right cover" src="/assets/cover1.png" alt="The cover for the book. The title is 'Paint Dries as a Train Goes Off the Rails. The author is Nicholas Marchuk. It describes...' ">
                 <p class="caption">Coming out XXX 2025</em>
@@ -40,10 +40,7 @@
             <em><u><a href="/books/">learn more...</a></u></em>
         </div>
         <div class="container">
-            <div class="flex_lr">
-                <div class="ml-embedded" data-form="a6zzhd"></div>
-                <p class="smallpp"><b>Subscribe to read the first three chapters of my book for free!</b></p>
-            </div>
+            {% include "_magnet.html" %}
         </div>
         {% endif %}
         <div class="container">
@@ -67,6 +64,11 @@
                 <p><a href="{{ post.url }}">{{ post.data.title }}</a></p><p>{{ post.data.date | date: "%B %d, %Y" }}</p>
             </div>
             {% endfor %}
+        </div>
+        {% endif %}
+        {% if tags contains "magnet_bottom" %}
+        <div class="container">
+            {% include "_magnet.html" %}
         </div>
         {% endif %}
         <div class="foot">
