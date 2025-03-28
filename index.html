@@ -1,0 +1,13 @@
+﻿---
+layout: blog_layout.html
+stylesheet: style_light.css
+title: recent posts
+tags: splash
+---
+{% for post in collections.post reversed %}
+<div class="flex_lr">
+    <h2><a href="{{ post.url }}">{{ post.data.title }}</a></h2><p>{{ post.data.date | date: "%B %d, %Y" }}</p>
+</div>
+{{ post.data.page.excerpt }}
+<p><em><u><a href="{{ post.url }}">continue reading...</a></em></u></p>
+{% endfor %}
