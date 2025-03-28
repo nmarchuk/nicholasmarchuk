@@ -1,0 +1,188 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
+
+body {
+    background-color: #ffcc99;
+    font-family: 'JetBrains Mono';
+    color: #1a1a1a;
+    margin: 0;
+    padding: 0;
+    font-size: 1rem;
+}
+
+h1 {
+    font-size: 2rem;
+    margin: 8px 0px;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin: 8px 0;
+}
+
+p {
+    margin: 10px 10px 10px 10px;
+}
+
+img {
+    margin: 8px auto 8px 0px;
+    max-width: 400px;
+    width: 100%;
+    height: auto;
+    border: 6px solid #9999ff;
+}
+
+.img-right {
+    float: right;
+    margin-left: 10px;
+    width: 200px;
+}
+
+.img-right.cover {
+    border: none;
+    margin: 0;
+    padding: 0;
+    width: 250px;
+}
+
+.caption {
+    font-style: italic;
+    margin: 0 auto;
+    padding: 8px 0;
+}
+
+button {
+    background-color: transparent;
+    font-size: 1rem;
+    font-family: "Jetbrains Mono";
+}
+
+.button.inline {
+    border: 0px none;
+    background-color: #fff7e6
+}
+
+.button.small {
+    font-size: 1rem;
+    padding: 4px;
+    margin: 8px 0px;
+    width: 20%;
+}
+
+.input {
+    width: 50%;
+    font-family: "JetBrains Mono";
+    font-size: 0.9rem;
+    border: none;
+}
+
+.textarea {
+    width: 50%;
+    height: 120px;
+    font-family: "JetBrains Mono";
+    border: none;
+    font-size: 0.9rem;
+}
+
+.control {
+    padding: 5px;
+}
+
+.flex_lr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: fit-content;
+    flex-wrap: wrap;
+}
+
+.image_box {
+    float: right;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    padding: 10px 10px 10px 20px;
+}
+
+.nav-list {
+    display: flex;
+    justify-content: left;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+  
+@media (max-width: 600px) { 
+    .img-right {
+        float: none;
+        display: block;
+        width: 95%;
+        margin: 0 auto;
+    }
+
+    .img-right.cover {
+        float: none;
+        display: block;
+        width: 80%;
+        margin: 0 auto;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1rem;
+    }
+
+    .input {
+        width: 95%;
+    }
+    
+    .textarea {
+        width: 95%;
+        height: 120px;
+    }
+    
+    button {
+        font-size: 0.7rem;
+    }
+}
+
+a {
+    color: #1a1a1a;
+    text-decoration: none;
+}
+
+a.inline {
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #9999ff;
+    text-decoration: underline;
+}
+
+.container {
+    max-width: 900px;
+    margin: 20px auto 20px auto;
+    padding: 2px 20px 20px 20px;
+    background-color: #fff7e6;
+    overflow: scroll;
+}
+
+.head {
+    max-width: 900px;
+    margin: 20px auto 20px auto;
+    padding: 2px 20px 2px 20px;
+    background-color: #fff7e6;
+}
+
+.foot {
+    max-width: 900px;
+    margin: 20px auto 20px auto;
+    padding: 2px 20px 2px 20px;
+    background-color: #fff7e6;
+    font-size: 0.9rem;
+}

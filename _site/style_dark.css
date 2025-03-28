@@ -1,0 +1,50 @@
+body {
+    background-color: #000063;
+    /* background-image: url('/assets/snowflakes.gif'); */
+    background-repeat: repeat;
+    background-size: 128px;
+    color: white;
+}
+
+img {
+    border: 6px solid #000063;
+}
+
+a {
+    color: white;
+}
+
+a:hover {
+    color: white;
+}
+
+.container {
+    background-color: #000033;
+}
+
+.head {
+    background-color: #000033;
+}
+
+.foot {
+    background-color: #000033;
+}
+
+button {
+    background-color: white;
+}
+
+.button.inline {
+    background-color: #000033;
+    color: white;
+}
+
+.input {
+    background-color: black;
+    color: white;
+}
+
+.textarea {
+    background-color: black;
+    color: white;
+}
