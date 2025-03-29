@@ -11,9 +11,11 @@ tags: magnet_bottom
 <p>
     <form action="https://api.staticforms.xyz/submit" method="post" id="staticform">
         <!-- Replace with your StaticForms accessKey -->
-        <input type="hidden" name="accessKey" value="05994b7e-09f9-46ab-89b2-bd5d4cd2c1b9">
+        <input type="hidden" name="apiKey" value="05994b7e-09f9-46ab-89b2-bd5d4cd2c1b9">
+        <input type="hidden" name="replyTo" value="@">
         <input type="hidden" name="subject" value="New message from contact form!">
         <!-- Replace with the url you want to redirect to -->
+        <input type="text" name="honeypot" style="display: none" tabindex="-1" autocomplete="off">
         <input type="hidden" name="redirectTo" value="http://nicholasmarchuk.com">
         <div class="field">
             <label class="label">name</label>
@@ -33,6 +35,13 @@ tags: magnet_bottom
                 <textarea class="textarea" name="message" placeholder="say something funny" required></textarea>
             </div>
         </div>
-        <button class="button small" type="submit">submit</button>
+        <div class="g-recaptcha" data-sitekey="6LehrwMrAAAAABDXlPkfgm_urj-0SZ5-GVpl-kaN"></div>
+        <script>
+            function onSubmit(token) {
+              document.getElementById("staticform").submit();
+            }
+          </script>
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <button class="button small" type="submit" data-callback="onSubmit" data-action="submit">submit</button>
     </form>    
 </p>
