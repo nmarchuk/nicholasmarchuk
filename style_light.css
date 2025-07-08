@@ -44,7 +44,7 @@ img {
     width: 225px;
 }
 
-.social {
+.img.social {
     height: 1.5rem;
     border: none;
     margin: 0;
@@ -154,7 +154,7 @@ button {
         font-size: 1rem;
     }
 
-    .social {
+    .img.social {
         height: 1.2rem;
     }
 
