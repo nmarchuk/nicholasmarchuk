@@ -44,6 +44,13 @@ img {
     width: 225px;
 }
 
+.social {
+    height: 1.5rem;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
 .caption {
     font-style: italic;
     margin: 0 auto;
@@ -145,6 +152,10 @@ button {
 
     h2 {
         font-size: 1rem;
+    }
+
+    .social {
+        height: 1.2rem;
     }
 
     .input {
