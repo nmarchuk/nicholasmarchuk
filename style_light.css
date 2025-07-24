@@ -199,6 +199,15 @@ a:hover {
     overflow: auto;
 }
 
+.reviewbubble {
+    max-width: 800px;
+    margin: 20px auto 20px auto;
+    padding: 2px 20px 20px 20px;
+    background-color: #ffffff;
+    overflow: auto;
+    border-radius: 30px;
+}
+
 .head {
     max-width: 900px;
     margin: 20px auto 20px auto;

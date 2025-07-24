@@ -18,6 +18,10 @@ a:hover {
     color: white;
 }
 
+.reviewbubble {
+    background-color: black;
+}
+
 .container {
     background-color: #000033;
 }
