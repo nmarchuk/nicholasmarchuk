@@ -37,6 +37,12 @@ img {
     width: 200px;
 }
 
+.img-left {
+    float: left;
+    margin-right: 10px;
+    width: 200px;
+}
+
 .img-right.cover {
     border: none;
     margin: 0;
@@ -108,6 +114,10 @@ button {
     width: 30%;
 }
 
+.medpp {
+    max-width: 60%;
+}
+
 .ml-embedded {
     padding: 20px 0px 0px 0px;
     color: #1a1a1a;
@@ -138,6 +148,14 @@ button {
         width: 95%;
         margin: 0 auto;
     }
+
+    .img-left {
+        float: none;
+        display: block;
+        width: 95%;
+        margin: 0 auto;
+    }
+
 
     .img-right.cover {
         float: none;
@@ -175,6 +193,15 @@ button {
         width: 100%;
     }
 
+    .medpp {
+        max-width: 100%;
+    }
+
+    iframe[src*="youtube"] {
+        width: 100% !important;
+        height: 200px;
+    }
+
 }
 
 a {
@@ -206,6 +233,14 @@ a:hover {
     background-color: #ffffff;
     overflow: auto;
     border-radius: 30px;
+}
+
+.reviewbubble.profile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: fit-content;
+    flex-wrap: wrap;
 }
 
 .head {
