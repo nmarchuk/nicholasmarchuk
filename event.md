@@ -2,10 +2,7 @@
 layout: blog_layout.html
 title: book release party!
 ---
-<div class="image_box">
-    <img class="img-right cover" src="/assets/cover1_3d.png" alt="The cover for the book. The title is 'Paint Dries as a Train Goes Off the Rails. The author is Nicholas Marchuk. The cover depicts a train derailment and pileup in a mixed media collage.' ">
-    <p class="caption">Come get your copy!</em>
-</div>
+{% include "_3dbox.html" %}
 
 *72 Joy St, Somerville / September 13, 2025 / 7:30-10:30pm*
 

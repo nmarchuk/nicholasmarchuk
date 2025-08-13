@@ -5,6 +5,7 @@ export default function(eleventyConfig) {
     eleventyConfig.addPassthroughCopy("style_light.css");
     eleventyConfig.addPassthroughCopy("assets");
     eleventyConfig.addPassthroughCopy("darkmode.js");
+    eleventyConfig.addPassthroughCopy("utils.js");
 
     eleventyConfig.setFrontMatterParsingOptions({ excerpt: true });
 

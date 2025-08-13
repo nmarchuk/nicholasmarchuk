@@ -23,6 +23,12 @@ p {
     margin: 10px 10px 10px 10px;
 }
 
+p.mega {
+    font-size: 3rem;
+    margin: 10px auto 0 auto;
+    width: fit-content;
+}
+
 img {
     margin: 8px auto 8px 0px;
     max-width: 400px;
@@ -61,6 +67,25 @@ img {
     font-style: italic;
     margin: 0 auto;
     padding: 8px 0;
+}
+
+
+a {
+    color: #1a1a1a;
+    text-decoration: none;
+}
+
+a.inline {
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #9999ff;
+    text-decoration: underline;
+}
+
+a.inverthover:hover {
+    color: white;
 }
 
 button {
@@ -140,7 +165,19 @@ button {
     gap: 8px;
     flex-wrap: wrap;
 }
-  
+
+.buybutton {
+    font-size: 1.5rem;
+    width: fit-content;
+    margin: 0 auto;
+    background-color: #9999ff;
+    color: black;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 10px;
+    text-decoration: none;
+}
+
 @media (max-width: 600px) { 
     .img-right {
         float: none;
@@ -197,25 +234,15 @@ button {
         max-width: 100%;
     }
 
+    .p.mega {
+        font-size: 1.5rem;
+    }
+
     iframe[src*="youtube"] {
         width: 100% !important;
         height: 200px;
     }
 
-}
-
-a {
-    color: #1a1a1a;
-    text-decoration: none;
-}
-
-a.inline {
-    text-decoration: underline;
-}
-
-a:hover {
-    color: #9999ff;
-    text-decoration: underline;
 }
 
 .container {
