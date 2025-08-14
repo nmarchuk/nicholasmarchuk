@@ -4,7 +4,7 @@ title: book release party!
 ---
 {% include "_3dbox.html" %}
 
-*72 Joy St, Somerville / September 13, 2025 / 7:30-10:30pm*
+*72 Joy St, Somerville / September 13, 2025 / 7 - 11pm*
 
 Come celebrate the release of my debut novel with an evening of **festivities**. There will be appetizers and non-alcoholic drinks for your enjoyment, as well as an **assortment** of statesmen, fools, debutantes, and **thought leaders**. The event will be at Life Drawing Boston in Somerville.
 
