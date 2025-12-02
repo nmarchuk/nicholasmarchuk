@@ -49,7 +49,14 @@
                 <p> {{ page.date | date: "%B %d, %Y" }}</p>
             </div>
             {% else %}
-            <h1>{{ title | default: " My Blog" }}</h1>
+                {% if tags contains "short" %}
+                <div class="flex_lr">
+                    <h1>{{ title | default: " Title" }}</h1>
+                    <p><a href="/shorts/">go back...</a></p>
+                </div>
+                {% else %}
+                <h1>{{ title | default: " My Blog" }}</h1>
+                {% endif %}
             {% endif %}
             <main>
                 {{ content }}
@@ -68,6 +75,11 @@
         {% if tags contains "magnet_bottom" %}
         <div class="container">
             {% include "_magnet.html" %}
+        </div>
+        {% endif %}
+        {% if tags contains "short" %}
+        <div class="container">
+            {% include "_short_footer.html" %}
         </div>
         {% endif %}
         <div class="foot">
