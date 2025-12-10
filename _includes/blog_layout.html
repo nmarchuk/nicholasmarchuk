@@ -32,36 +32,50 @@
         </div>
         {% if tags contains "splash" %}
         <div class="container">
+            <div class="image_box">
+            <img class="img-right cover" src="/assets/tbd.png" alt="A grayed out picture of a canyon, pixelized, with a question mark in the center.">
+            <p class="caption">Coming out in 2026</p>
+        </div>
+        <h2>Follow Me Unhappy Flower</h2>
+        {% include "followme/_blurb.html" %}
+        </div>
+        <div class="container">
+            {% include "_magnet.html" %}
+        </div>
+        <div class="container">
             <h1><a href="/books/">paint dries as a train goes off the rails</a></h1>
             {% include "_3dbox.html" %}
             {% include "_blurb.html" %}
             <p><em><a class="a inline" href="/books/">learn more...</a></u></em></p>
             <p><em><a class="a inline" href="https://www.goodreads.com/book/show/238762543-paint-dries-as-a-train-goes-off-the-rails">view on goodreads...</a></em></p>
         </div>
-        <div class="container">
-            {% include "_magnet.html" %}
-        </div>
         {% endif %}
-        <div class="container">
-            {% if tags contains "post" %}
-            <div class="flex_lr">
-                <h1>{{ title | default: " My Blog" }}</h1>
-                <p> {{ page.date | date: "%B %d, %Y" }}</p>
-            </div>
-            {% else %}
-                {% if tags contains "short" %}
-                <div class="flex_lr">
-                    <h1>{{ title | default: " Title" }}</h1>
-                    <p><a href="/shorts/">go back...</a></p>
-                </div>
-                {% else %}
-                <h1>{{ title | default: " My Blog" }}</h1>
-                {% endif %}
-            {% endif %}
+        {% if tags contains "multicontainer" %}
             <main>
                 {{ content }}
             </main>
-        </div>
+        {% else %}
+            <div class="container">
+                {% if tags contains "post" %}
+                <div class="flex_lr">
+                    <h1>{{ title | default: " My Blog" }}</h1>
+                    <p> {{ page.date | date: "%B %d, %Y" }}</p>
+                </div>
+                {% else %}
+                    {% if tags contains "short" %}
+                    <div class="flex_lr">
+                        <h1>{{ title | default: " Title" }}</h1>
+                        <p><a href="/shorts/">go back...</a></p>
+                    </div>
+                    {% else %}
+                    <h1>{{ title | default: " My Blog" }}</h1>
+                    {% endif %}
+                {% endif %}
+                <main>
+                    {{ content }}
+                </main>
+            </div>
+        {% endif %}
         {% if tags contains "post" %}
         <div class="container">
             <h2>feed</h2>
