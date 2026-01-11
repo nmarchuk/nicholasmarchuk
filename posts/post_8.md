@@ -4,6 +4,8 @@ date: 2026-01-11
 ---
 My memory of Noah Kahan is friends of mine being excited about him a few years ago. Finally, they said--someone is making pop music about the place we're from. My extended social media circle was buzzing about the prospect. No more would artists from Nashville and LA come down from on high to rap about being the cheer captain on the bleachers, or having Julio get the stretch--they would rap about what it was like to grow up in New Hampshire. I didn't think about it much at the time.
 ---
+![A sunny day in a Vermont forest.](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Vermont_Mountain_Forest.jpg/640px-Vermont_Mountain_Forest.jpg)
+
 Imagine my surprise when several years later, Noah Kahan's "Khanate" remains in power. We have a Pandora station at work that plays what's popular, and time and time again, I heard some of the same jangly stuff. I realized that I was listening to the same artist in 2025 as had been promised to me. Imagine my surprise, as well, when it turned out that this artist was actually popular during the pandemic. I was listening to someone rant about 'Covid on the planes' in 2025! I was sure this was someone with an axe to grind, but actually it was made at the time when there was definitely Covid on the planes.
 
 Arthur Tiberius Kahan, stage name Noah Kahan, was raised on a tree farm in Vermont. He also went to high school near Lebanon over in New Hampshire, and grew up playing guitar and posting on Soundcloud. After graduating high school he was eventually signed by a major label, and lived alternately on the road and in the NYC-LA vortex for six years before moving home to Vermont during the pandemic.
