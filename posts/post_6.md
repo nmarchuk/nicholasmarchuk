@@ -35,7 +35,7 @@ Boston people: My book release party is officially September 13th, 7-11pm at 72 
 </div>
 
 ## how you can help
-Tell everyone about the book! Repost my stuff! Follow me on <a class="a inline" href="https://www.instagram.com/marchukbooks">Instagram</a> <a class="a inline" href="https://tiktok.com/@marchukbooks">Tiktok</a> and <a class="a inline" href="https://www.youtube.com/@marchukbooks">YouTube</a>. You can also request that your local library orders my paperback.
+Tell everyone about the book! Repost my stuff! Follow me on [Instagram](https://www.instagram.com/marchukbooks) [Tiktok](https://tiktok.com/@marchukbooks) and [YouTube](https://www.youtube.com/@marchukbooks). You can also request that your local library orders my paperback.
 
 ## what else? 
 I did another rambling YouTube video, this time on a philosophical topic: Do you need other people?

@@ -9,6 +9,8 @@ export default function(eleventyConfig) {
 
     eleventyConfig.setFrontMatterParsingOptions({ excerpt: true });
 
+	eleventyConfig.addGlobalData("currentYear", () => new Date().getFullYear());
+
     eleventyConfig.addPlugin(feedPlugin, {
 		type: "rss", // or "rss", "json", "atom"
 		outputPath: "/feed.xml",

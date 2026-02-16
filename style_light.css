@@ -76,7 +76,7 @@ a {
     text-decoration: none;
 }
 
-a.inline {
+p a {
     text-decoration: underline;
 }
 
