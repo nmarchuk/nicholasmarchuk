@@ -28,7 +28,7 @@ There is, in all cases, a limit to how much people will pay. The same logic appl
 
 People naturally do not want money to be the determining factor of access to everything in life. However, as demand for tourism grows, it will be. There will be no form of 'rent control' for AirBnBs or for the price of food in Venice--those prices will go up as more people try to fit into what little land there is there. Flight prices will go up as more planes squeeze into that small airport and more people try to travel at once. The result is that everyone is spending more money to be less happy.
 
-![The Grand Canal of Venice, a waterway lined with old buildings and boats running through it.](https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Rialto_vista_dietra-camerlenghi.JPG/800px-Rialto_vista_dietra-camerlenghi.JPG)
+![The Grand Canal of Venice, a waterway lined with old buildings and boats running through it.](https://upload.wikimedia.org/wikipedia/commons/8/8a/Rialto_vista_dietra-camerlenghi.JPG)
 
 *Public domain*
 

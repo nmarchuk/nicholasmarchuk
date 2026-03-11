@@ -1,0 +1,28 @@
+---
+layout: blog_layout.html
+stylesheet: /style_light.css
+title: blog
+tags: multicontainer
+---
+
+<div class="container">
+    <h1>blog</h1>
+    <p>
+        I got inspired and built out my blog a little more. This way I have a place to post about movies/shows/music/etc. as I desire to.
+    </p>
+    <p><a href="music">music reviews</a></p>
+    <p><a href="movies">movie/show reviews</a></p>
+    <p><a href="photos">photo gallery</a></p>
+
+    Below is my longform stuff that I try to write for my newsletter monthly.
+</div>
+
+<div class="container">
+    {% for post in collections.post reversed %}
+    <div class="flex_lr">
+        <h2><a href="{{ post.url }}">{{ post.data.title }}</a></h2><p>{{ post.data.date | date: "%B %d, %Y" }}</p>
+    </div>
+    {{ post.data.page.excerpt }}
+    <p><em><u><a href="{{ post.url }}">continue reading...</a></em></u></p>
+    {% endfor %}
+</div>

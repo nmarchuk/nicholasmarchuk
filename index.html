@@ -1,13 +1,24 @@
-﻿---
+---
 layout: blog_layout.html
 stylesheet: style_light.css
-title: blog
-tags: splash
+title: home page
+tags: multicontainer
 ---
-{% for post in collections.post reversed %}
-<div class="flex_lr">
-    <h2><a href="{{ post.url }}">{{ post.data.title }}</a></h2><p>{{ post.data.date | date: "%B %d, %Y" }}</p>
+<div class="container">
+    <div class="image_box">
+    <img class="img-right cover" src="/assets/tbd.png" alt="A grayed out picture of a canyon, pixelized, with a question mark in the center.">
+    <p class="caption">releasing in 2026</p>
 </div>
-{{ post.data.page.excerpt }}
-<p><em><u><a href="{{ post.url }}">continue reading...</a></em></u></p>
-{% endfor %}
+<h2>Blood of Agave</h2>
+{% include "bloodofagave/_blurb.html" %}
+</div>
+<div class="container">
+    {% include "_magnet.html" %}
+</div>
+<div class="container">
+    <h1><a href="/books/">paint dries as a train goes off the rails</a></h1>
+    {% include "_3dbox.html" %}
+    {% include "_blurb.html" %}
+    <p><em><a class="a inline" href="/books/">learn more...</a></u></em></p>
+    <p><em><a class="a inline" href="https://www.goodreads.com/book/show/238762543-paint-dries-as-a-train-goes-off-the-rails">view on goodreads...</a></em></p>
+</div>

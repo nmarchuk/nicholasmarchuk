@@ -1,0 +1,29 @@
+---
+layout: blog_layout.html
+stylesheet: /style_light.css
+title: music
+tags: multicontainer
+---
+<div class="container">
+    <h1>music</h1>
+    <p>writing about some of the music I like and almost none of the stuff I don't like</p>
+    <p><a href="/blog/"><< back</a></p>
+</div>
+
+{% for review in collections["music-review"] reversed %}
+<div class="music-card">
+    <div class="music-card-left">
+        <img class="music-cover" src="{{ review.data.cover }}" alt="{{ review.data.title }} cover">
+    </div>
+    <div class="music-card-right">
+        <div class="music-info">
+            <p class="music-artist">{{ review.data.artist }}</p>
+            <h2 class="music-album">{{ review.data.title }}</h2>
+        </div>
+        <div class="music-review-text">
+            <div class="music-score">{{ review.data.score }}</div>
+            {{ review.content }}
+        </div>
+    </div>
+</div>
+{% endfor %}

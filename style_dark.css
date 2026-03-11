@@ -1,37 +1,17 @@
-body {
-    background-color: #000063;
-    /* background-image: url('/assets/snowflakes.gif'); */
-    background-repeat: repeat;
-    background-size: 128px;
-    color: white;
+:root {
+    --color-bg: #000063;
+    --color-text: white;
+    --color-accent: #2e63b8;
+    --color-surface: #000033;
+    --color-surface-alt: black;
+    --color-input-bg: black;
+    --color-input-text: white;
+    --color-review-header: #330066;
+    --color-banner-text-bg: rgba(0, 0, 51, 0.85);
 }
 
 img {
-    border: 6px solid #000063;
-}
-
-a {
-    color: white;
-}
-
-a:hover {
-    color: white;
-}
-
-.reviewbubble {
-    background-color: black;
-}
-
-.container {
-    background-color: #000033;
-}
-
-.head {
-    background-color: #000033;
-}
-
-.foot {
-    background-color: #000033;
+    border-color: var(--color-bg);
 }
 
 button {
@@ -39,18 +19,18 @@ button {
 }
 
 .button.inline {
-    background-color: #000033;
-    color: white;
+    background-color: var(--color-surface);
+    color: var(--color-text);
 }
 
 .input {
-    background-color: black;
-    color: white;
+    background-color: var(--color-input-bg);
+    color: var(--color-input-text);
 }
 
 .textarea {
-    background-color: black;
-    color: white;
+    background-color: var(--color-input-bg);
+    color: var(--color-input-text);
 }
 
 .ml-form-embedContent {

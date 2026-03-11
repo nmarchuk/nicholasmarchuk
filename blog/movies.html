@@ -1,0 +1,26 @@
+---
+layout: blog_layout.html
+stylesheet: /style_light.css
+title: movies/shows
+tags: multicontainer
+---
+<div class="container">
+    <h1>movies/shows</h1>
+    <p>someone suggested that I create a 'letter box' but I already have a mailbox, and this is better because nobody will read it</p>
+    <p><a href="/blog/"><< back</a></p>
+</div>
+
+{% for review in collections["movie-review"] reversed %}
+<div class="review-card">
+    <div class="review-header">
+        <h2>{{ review.data.title }}</h2>
+        <p class="review-rating">{{ review.data.rating }}</p>
+    </div>
+    <div class="review-body">
+        <img class="review-poster" src="{{ review.data.poster }}" alt="{{ review.data.title }} poster">
+        <div class="review-text">
+            {{ review.content }}
+        </div>
+    </div>
+</div>
+{% endfor %}
