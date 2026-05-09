@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "Bash(ls -la /c/Users/eerus/Documents/Website/firstwebsite/*.html)",
+      "Bash(ls -la /c/Users/eerus/Documents/Website/firstwebsite/*.js)",
+      "Bash(ls -la /c/Users/eerus/Documents/Website/firstwebsite/*.css)"
     ]
   }
 }
