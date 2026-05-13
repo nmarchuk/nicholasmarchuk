@@ -1,0 +1,78 @@
+---
+layout: blog_layout.html
+title: colors
+---
+<div style="display: grid; grid-template-columns: 50% 50%; padding: 10px;">
+    <label for="coolors-url"><a href="https://coolors.co/generate">coolors.co</a> url</label>
+    <input type="text" id="coolors-url" placeholder="coolors.co url">
+    <label for="color-1">Background</label>
+    <input type="text" id="color-1" class="color-box">
+    <label for="color-2">Accent</label>
+    <input type="text" id="color-2" class="color-box">
+    <label for="color-3">Surface</label>
+    <input type="text" id="color-3" class="color-box">
+    <label for="color-4">Text</label>
+    <input type="text" id="color-4" class="color-box">
+    <label for="color-5">Surface alt</label>
+    <input type="text" id="color-5" class="color-box">
+</div>
+<button id="rotate", class="buybutton">Rotate</button>
+<button id="random", class="buybutton">Random</button>
+<button id="text-black", class="buybutton">Black Text</button>
+<button id="text-white", class="buybutton">White Text</button>
+
+
+<script>
+const colorVars = ['--color-bg', '--color-accent', '--color-surface', '--color-text', '--color-surface-alt'];
+const boxes = [1, 2, 3, 4, 5].map(n => document.getElementById('color-' + n));
+
+function setColor(i, value) {
+    const m = (value || '').trim().match(/^#?([0-9a-fA-F]{6})$/);
+    const style = document.documentElement.style;
+    if (m) style.setProperty(colorVars[i], '#' + m[1].toLowerCase());
+    else style.removeProperty(colorVars[i]);
+}
+
+boxes.forEach((box, i) => box.addEventListener('input', () => setColor(i, box.value)));
+
+document.getElementById('rotate').addEventListener('click', () => {
+    const values = boxes.map(b => b.value);
+    boxes.forEach((box, i) => {
+        box.value = values[(i + 4) % 5];
+        setColor(i, box.value);
+    });
+});
+
+document.getElementById('random').addEventListener('click', () => {
+    const values = boxes.map(b => b.value);
+    for (let i = values.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [values[i], values[j]] = [values[j], values[i]];
+    }
+    boxes.forEach((box, i) => {
+        box.value = values[i];
+        setColor(i, box.value);
+    });
+});
+
+document.getElementById('text-black').addEventListener('click', () => {
+    setColor(colorVars.indexOf('--color-text'), "#000000")
+})
+document.getElementById('text-white').addEventListener('click', () => {
+    setColor(colorVars.indexOf('--color-text'), "#ffffff")
+})
+
+document.getElementById('coolors-url').addEventListener('input', e => {
+    const match = e.target.value.match(/coolors\.co\/(?:palette\/)?([0-9a-fA-F-]+)/);
+    if (!match) return;
+    const hexes = match[1].split('-');
+    boxes.forEach((box, i) => {
+        box.value = /^[0-9a-fA-F]{6}$/.test(hexes[i] || '') ? '#' + hexes[i].toLowerCase() : '';
+        setColor(i, box.value);
+    });
+});
+</script>
+<img src="/assets/authorphoto.jpg", class="img-right"></p>
+<p>
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+</p>
