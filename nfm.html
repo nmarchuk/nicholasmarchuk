@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nobody Fucking Move</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f5f5f5;
+    color: #1a1a1a;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  header {
+    background: #111;
+    color: #fff;
+    padding: 1.25rem 1rem 1rem;
+  }
+  header h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  header p {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 0.2rem;
+  }
+
+  .section {
+    margin: 1rem 0.75rem 0;
+  }
+
+  .section-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2em 0.6em;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+  }
+
+  .label-townsfolk { background: #dbeafe; color: #1d4ed8; }
+  .label-outsider  { background: #dcfce7; color: #15803d; }
+  .label-minion    { background: #f3e8ff; color: #7e22ce; }
+  .label-demon     { background: #fee2e2; color: #b91c1c; }
+  .label-fabled    { background: #fef9c3; color: #854d0e; }
+
+  .card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 0.8rem 0.9rem;
+    margin-bottom: 0.5rem;
+    border-left: 3px solid;
+  }
+  .card.townsfolk { border-color: #2563eb; }
+  .card.outsider  { border-color: #16a34a; }
+  .card.minion    { border-color: #9333ea; }
+  .card.demon     { border-color: #dc2626; }
+  .card.fabled    { border-color: #ca8a04; }
+
+  .card-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+  }
+  .card-ability {
+    font-size: 0.85rem;
+    color: #555;
+  }
+
+  .note {
+    font-size: 0.78rem;
+    color: #777;
+    background: #fff;
+    border-radius: 8px;
+    padding: 0.7rem 0.9rem;
+    margin: 1rem 0.75rem 0;
+    border-left: 3px solid #f59e0b;
+  }
+  .note strong { color: #555; }
+
+  footer {
+    text-align: center;
+    font-size: 0.72rem;
+    color: #aaa;
+    padding: 1.5rem 1rem;
+    margin-top: 1rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Nobody Fucking Move</h1>
+  <p>by Brockwell · v1.0.0</p>
+</header>
+
+<div class="section">
+  <span class="section-label label-townsfolk">Townsfolk</span>
+
+  <div class="card townsfolk">
+    <div class="card-name">Snake Charmer</div>
+    <div class="card-ability">Each night, choose an alive player: a chosen Demon swaps characters & alignments with you & is then poisoned.</div>
+  </div>
+  <div class="card townsfolk">
+    <div class="card-name">Alsaahir</div>
+    <div class="card-ability">Once per day, if you publicly guess which players are Minion(s) and which are Demon(s), good wins.</div>
+  </div>
+  <div class="card townsfolk">
+    <div class="card-name">Slayer</div>
+    <div class="card-ability">Once per game, during the day, publicly choose a player. If they are the Demon, they die.</div>
+  </div>
+  <div class="card townsfolk">
+    <div class="card-name">Philosopher</div>
+    <div class="card-ability">Once per game, at night, choose a good character: gain that ability. If this character is in play, they are drunk.</div>
+  </div>
+  <div class="card townsfolk">
+    <div class="card-name">Alchemist</div>
+    <div class="card-ability">You have a Minion ability. When using this, the Storyteller may prompt you to choose differently.</div>
+  </div>
+  <div class="card townsfolk">
+    <div class="card-name">Virgin</div>
+    <div class="card-ability">The 1st time you are nominated, if the nominator is a Townsfolk, they are executed immediately.</div>
+  </div>
+</div>
+
+<div class="section">
+  <span class="section-label label-outsider">Outsiders</span>
+
+  <div class="card outsider">
+    <div class="card-name">Heretic</div>
+    <div class="card-ability">Whoever wins, loses & whoever loses, wins, even if you are dead.</div>
+  </div>
+  <div class="card outsider">
+    <div class="card-name">Damsel</div>
+    <div class="card-ability">All Minions know you are in play. If a Minion publicly guesses you (once), your team loses.</div>
+  </div>
+  <div class="card outsider">
+    <div class="card-name">Klutz</div>
+    <div class="card-ability">When you learn that you died, publicly choose 1 alive player: if they are evil, your team loses.</div>
+  </div>
+</div>
+
+<div class="section">
+  <span class="section-label label-minion">Minions</span>
+
+  <div class="card minion">
+    <div class="card-name">Psychopath</div>
+    <div class="card-ability">Each day, before nominations, you may publicly choose a player: they die. If executed, you only die if you lose roshambo.</div>
+  </div>
+  <div class="card minion">
+    <div class="card-name">Goblin</div>
+    <div class="card-ability">If you publicly claim to be the Goblin when nominated & are executed that day, your team wins.</div>
+  </div>
+  <div class="card minion">
+    <div class="card-name">Boomdandy</div>
+    <div class="card-ability">If you are executed, all but 3 players die. 1 minute later, the player with the most players pointing at them dies.</div>
+  </div>
+</div>
+
+<div class="section">
+  <span class="section-label label-demon">Demons</span>
+
+  <div class="card demon">
+    <div class="card-name">Pukka</div>
+    <div class="card-ability">Each night, choose a player: they are poisoned. The previously poisoned player dies then becomes healthy.</div>
+  </div>
+  <div class="card demon">
+    <div class="card-name">Vortox</div>
+    <div class="card-ability">Each night*, choose a player: they die. Townsfolk abilities yield false info. Each day, if no-one is executed, evil wins.</div>
+  </div>
+</div>
+
+<div class="section">
+  <span class="section-label label-fabled">Fabled</span>
+
+  <div class="card fabled">
+    <div class="card-name">Sentinel</div>
+    <div class="card-ability">There might be 1 extra or 1 fewer Outsider in play.</div>
+  </div>
+  <div class="card fabled">
+    <div class="card-name">Duchess</div>
+    <div class="card-ability">Each day, 3 players may choose to visit you. At night*, each visitor learns how many visitors are evil, but 1 gets false info.</div>
+  </div>
+</div>
+
+<div class="section">
+  <span class="section-label label-townsfolk">First Night</span>
+
+  <div class="card townsfolk">
+    <div class="card-name">1. Philosopher</div>
+    <div class="card-ability">The Philosopher may choose a good character to gain its ability.</div>
+  </div>
+  <div class="card townsfolk">
+    <div class="card-name">2. Alchemist</div>
+    <div class="card-ability">Learns their Minion ability.</div>
+  </div>
+  <div class="card townsfolk">
+    <div class="card-name">3. Snake Charmer</div>
+    <div class="card-ability">Chooses an alive player. If the player is the Demon, swap their roles and poison the new Snake Charmer.</div>
+  </div>
+  <div class="card demon">
+    <div class="card-name">4. Pukka</div>
+    <div class="card-ability">Chooses a player to poison.</div>
+  </div>
+  <div class="card outsider">
+    <div class="card-name">5. Damsel</div>
+    <div class="card-ability">All Minions learn that a Damsel is in play.</div>
+  </div>
+</div>
+
+<div class="section">
+  <span class="section-label label-demon">Other Nights</span>
+
+  <div class="card townsfolk">
+    <div class="card-name">1. Philosopher</div>
+    <div class="card-ability">The Philosopher may choose a good character to gain its ability.</div>
+  </div>
+  <div class="card townsfolk">
+    <div class="card-name">2. Snake Charmer</div>
+    <div class="card-ability">Chooses an alive player. If the player is the Demon, swap their roles and poison the new Snake Charmer.</div>
+  </div>
+  <div class="card demon">
+    <div class="card-name">3. Pukka</div>
+    <div class="card-ability">Chooses a player to poison. Previously poisoned player dies.</div>
+  </div>
+  <div class="card demon">
+    <div class="card-name">4. Vortox</div>
+    <div class="card-ability">Chooses a player to kill.</div>
+  </div>
+</div>
+
+<footer>botcscripts.com/script/4669</footer>
+
+</body>
+</html>

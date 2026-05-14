@@ -190,6 +190,10 @@ button {
     text-decoration: none;
 }
 
+.wn_content {
+    max-width: 1100px;
+}
+
 @media (max-width: 600px) { 
     .img-right {
         float: none;
