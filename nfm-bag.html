@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFM — Build the Bag</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f5f5f5; color: #1a1a1a; font-size: 15px;
+    line-height: 1.5; padding-bottom: 6rem;
+  }
+
+  /* ── Shared header ── */
+  .app-header {
+    background: #111; color: #fff; padding: 1.25rem 1rem 1rem;
+  }
+  .app-header h1 { font-size: 1.3rem; font-weight: 700; }
+  .app-header p  { font-size: 0.8rem; color: #888; margin-top: 0.2rem; }
+
+  /* ── Player count ── */
+  .player-count { margin: 1rem 0.75rem 0; }
+  .player-count h2 {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #666; margin-bottom: 0.5rem;
+  }
+  .count-buttons { display: flex; gap: 0.5rem; }
+  .count-btn {
+    flex: 1; padding: 0.7rem; border: 2px solid #ddd; border-radius: 8px;
+    background: #fff; font-size: 1rem; font-weight: 600; cursor: pointer;
+    color: #1a1a1a; transition: all 0.15s;
+  }
+  .count-btn.active { border-color: #111; background: #111; color: #fff; }
+
+  /* ── Sentinel toggle ── */
+  .sentinel-toggle {
+    margin: 0.75rem 0.75rem 0; background: #fff; border-radius: 8px;
+    border-left: 3px solid #ca8a04; padding: 0.75rem 0.9rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  }
+  .sentinel-toggle .sentinel-text label {
+    font-size: 0.88rem; font-weight: 600; cursor: pointer; display: block;
+  }
+  .sentinel-toggle .sentinel-text p { font-size: 0.75rem; color: #888; }
+  .toggle-switch { position: relative; width: 44px; height: 26px; flex-shrink: 0; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute; inset: 0; background: #ccc; border-radius: 13px;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .toggle-track::after {
+    content: ''; position: absolute; width: 20px; height: 20px;
+    background: #fff; border-radius: 50%; top: 3px; left: 3px;
+    transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle-switch input:checked + .toggle-track { background: #ca8a04; }
+  .toggle-switch input:checked + .toggle-track::after { transform: translateX(18px); }
+
+  /* ── Bag builder sections ── */
+  .section { margin: 1rem 0.75rem 0; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+  .section-label {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 0.2em 0.6em; border-radius: 3px; display: inline-block;
+  }
+  .label-townsfolk { background: #dbeafe; color: #1d4ed8; }
+  .label-outsider  { background: #dcfce7; color: #15803d; }
+  .label-minion    { background: #f3e8ff; color: #7e22ce; }
+  .label-demon     { background: #fee2e2; color: #b91c1c; }
+  .count-townsfolk { color: #1d4ed8; font-size: 0.75rem; font-weight: 700; }
+  .count-outsider  { color: #15803d; font-size: 0.75rem; font-weight: 700; }
+  .count-minion    { color: #7e22ce; font-size: 0.75rem; font-weight: 700; }
+  .count-demon     { color: #b91c1c; font-size: 0.75rem; font-weight: 700; }
+  .count-over      { color: #f59e0b; font-size: 0.75rem; font-weight: 700; }
+
+  /* ── Role cards (bag builder) ── */
+  .role-card {
+    background: #fff; border-radius: 8px; padding: 0.8rem 0.9rem;
+    margin-bottom: 0.5rem; border-left: 3px solid; cursor: pointer;
+    user-select: none; transition: opacity 0.15s; -webkit-tap-highlight-color: transparent;
+  }
+  .role-card.townsfolk { border-color: #2563eb; }
+  .role-card.outsider  { border-color: #16a34a; }
+  .role-card.minion    { border-color: #9333ea; }
+  .role-card.demon     { border-color: #dc2626; }
+  .role-card.selected.townsfolk { background: #eff6ff; }
+  .role-card.selected.outsider  { background: #f0fdf4; }
+  .role-card.selected.minion    { background: #faf5ff; }
+  .role-card.selected.demon     { background: #fef2f2; }
+  .role-card.dimmed { opacity: 0.35; cursor: default; }
+  .role-name   { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.15rem; }
+  .role-ability { font-size: 0.82rem; color: #666; }
+
+  /* ── Bottom bar ── */
+  .bottom-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: #fff; border-top: 1px solid #e5e5e5;
+    padding: 0.75rem 1rem; display: flex; gap: 0.6rem;
+  }
+  .btn-random {
+    flex: 1; padding: 0.75rem; border-radius: 8px; border: 2px solid #ddd;
+    background: #fff; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: #333;
+  }
+  .btn-dark {
+    flex: 2; padding: 0.75rem; border-radius: 8px; border: none;
+    background: #111; color: #fff; font-size: 0.9rem; font-weight: 700; cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-dark:disabled { opacity: 0.35; cursor: default; }
+  .btn-outline {
+    width: 100%; padding: 0.75rem; border-radius: 8px; border: 2px solid #ddd;
+    background: #fff; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: #333;
+    font-family: inherit;
+  }
+
+  /* ══════════════════════════════
+     OVERLAY (covers whole screen)
+  ══════════════════════════════ */
+  #overlay { display: none; position: fixed; inset: 0; z-index: 100; }
+
+  /* ── Tap-to-reveal screen ── */
+  #revealScreen {
+    position: absolute; inset: 0; background: #111;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; padding: 2rem; text-align: center;
+  }
+  #revealProgress { position: absolute; top: 1.5rem; font-size: 0.78rem; color: #555; }
+  #revealHint     { font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; }
+  #revealSub      { font-size: 0.85rem; color: #555; }
+
+  /* ── Role reveal screen ── */
+  #roleScreen {
+    position: absolute; inset: 0; display: none;
+    flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1.5rem; text-align: center;
+  }
+  #roleScreen.townsfolk { background: #eff6ff; }
+  #roleScreen.outsider  { background: #f0fdf4; }
+  #roleScreen.minion    { background: #faf5ff; }
+  #roleScreen.demon     { background: #fef2f2; }
+  #roleTypeBadge {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.25em 0.7em; border-radius: 4px; margin-bottom: 1rem;
+  }
+  .badge-townsfolk { background: #dbeafe; color: #1d4ed8; }
+  .badge-outsider  { background: #dcfce7; color: #15803d; }
+  .badge-minion    { background: #f3e8ff; color: #7e22ce; }
+  .badge-demon     { background: #fee2e2; color: #b91c1c; }
+  #roleName    { font-size: 2rem; font-weight: 800; margin-bottom: 0.6rem; line-height: 1.1; }
+  #roleAbility { font-size: 0.88rem; color: #555; line-height: 1.5; margin-bottom: 2rem; max-width: 320px; }
+  #roleProgress { position: absolute; top: 1.5rem; font-size: 0.78rem; color: #888; }
+  #nameInput {
+    width: 100%; max-width: 320px; font-size: 1.1rem; padding: 0.75rem 1rem;
+    border: 2px solid #ddd; border-radius: 10px; background: #fff; outline: none;
+    margin-bottom: 0.75rem; font-family: inherit;
+  }
+  #nameInput:focus { border-color: #111; }
+  #nameConfirm {
+    width: 100%; max-width: 320px; padding: 0.8rem; border-radius: 10px;
+    border: none; background: #111; color: #fff; font-size: 1rem; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+  }
+  #nameConfirm:disabled { opacity: 0.35; }
+
+  /* ── Summary / players screen ── */
+  #summaryScreen { position: absolute; inset: 0; background: #f5f5f5; overflow-y: auto; display: none; padding-bottom: 5rem; }
+  .summary-section { margin: 1rem 0.75rem 0; }
+  .summary-label {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.2em 0.6em; border-radius: 3px; display: inline-block; margin-bottom: 0.5rem;
+  }
+  .player-card {
+    background: #fff; border-radius: 8px; padding: 0.8rem 0.9rem; margin-bottom: 0.5rem;
+    border-left: 3px solid; display: flex; align-items: center; justify-content: space-between;
+  }
+  .player-card.townsfolk { border-color: #2563eb; }
+  .player-card.outsider  { border-color: #16a34a; }
+  .player-card.minion    { border-color: #9333ea; }
+  .player-card.demon     { border-color: #dc2626; }
+  .player-role { font-weight: 600; font-size: 0.95rem; }
+  .player-name { font-size: 0.88rem; color: #555; }
+  .summary-actions { padding: 0 0.75rem; margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+
+  /* ── Night order screen ── */
+  #nightScreen { position: absolute; inset: 0; background: #f5f5f5; overflow-y: auto; display: none; padding-bottom: 5rem; }
+  .night-list { padding: 1rem 0.75rem 0; }
+  .night-card {
+    background: #fff; border-radius: 8px; padding: 0.8rem 0.9rem; margin-bottom: 0.5rem;
+    border-left: 3px solid #ddd; cursor: pointer; user-select: none;
+    -webkit-tap-highlight-color: transparent; transition: opacity 0.15s;
+  }
+  .night-card.active   { border-left-color: #111; background: #fafafa; }
+  .night-card.done     { opacity: 0.38; cursor: pointer; }
+  .night-card-header   { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+  .night-card-left     { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .night-card-name     { font-weight: 600; font-size: 0.95rem; }
+  .night-card-player   { font-size: 0.82rem; color: #888; }
+  .night-card-note     { font-size: 0.78rem; color: #aaa; margin-top: 0.15rem; }
+  .tag {
+    display: inline-block; font-size: 0.6rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.15em 0.45em; border-radius: 3px;
+  }
+  .tag-done    { background: #f0f0f0; color: #bbb; }
+  .tag-active  { background: #111; color: #fff; }
+  .tag-pending { background: #f5f5f5; color: #ccc; }
+  .tag-philo   { background: #fef9c3; color: #854d0e; }
+  .tag-poison  { background: #fee2e2; color: #b91c1c; }
+  .tag-dies    { background: #111; color: #fff; }
+  .tag-dead    { background: #333; color: #aaa; }
+  .player-card.dead { opacity: 0.45; }
+  #playerActionScreen, #vortoxScreen { position: absolute; inset: 0; background: #f5f5f5; display: none; flex-direction: column; }
+
+  /* ── Night card (full-screen prompt for player) ── */
+  #nightCardScreen {
+    position: absolute; inset: 0; background: #111; display: none;
+    flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; user-select: none; padding: 2rem; text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #nightCardText { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 0.6rem; line-height: 1.3; }
+  #nightCardSub  { font-size: 0.85rem; color: #555; }
+
+  /* ── Philosopher picker ── */
+  #philoScreen {
+    position: absolute; inset: 0; background: #f5f5f5;
+    display: none; flex-direction: column;
+  }
+  .philo-body { padding: 1rem 0.75rem; overflow-y: auto; flex: 1; }
+  .philo-option {
+    background: #fff; border-radius: 8px; padding: 0.8rem 0.9rem;
+    margin-bottom: 0.5rem; border-left: 3px solid; cursor: pointer;
+    -webkit-tap-highlight-color: transparent; user-select: none;
+  }
+  .philo-option.townsfolk { border-color: #2563eb; }
+  .philo-option.outsider  { border-color: #16a34a; }
+  .philo-option-name    { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.1rem; }
+  .philo-option-ability { font-size: 0.82rem; color: #666; }
+  .philo-footer { padding: 0 0.75rem 1rem; flex-shrink: 0; }
+
+  #alchemistScreen, #alchemistFalseScreen, #snakeCharmerScreen, #scSwapScreen, #pukkaScreen {
+    position: absolute; inset: 0; background: #f5f5f5;
+    display: none; flex-direction: column;
+  }
+  #scSwapScreen { background: #111; }
+  .sc-swap-card {
+    background: #1a1a1a; border-radius: 10px; padding: 1.2rem 1rem;
+    border-left: 4px solid;
+    color: #fff;
+  }
+  .sc-swap-card.good { border-color: #2563eb; }
+  .sc-swap-card.evil { border-color: #dc2626; }
+  .sc-swap-card .sc-player { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .sc-swap-card .sc-role   { font-size: 0.85rem; color: #aaa; margin-bottom: 0.5rem; }
+  .sc-swap-card .sc-note   { font-size: 0.78rem; color: #666; font-style: italic; }
+  .sc-swap-card.sc-unseen  { cursor: pointer; border-style: dashed; }
+  .sc-swap-card.sc-shown   { opacity: 0.55; }
+</style>
+</head>
+<body>
+
+<!-- ══════════ BAG BUILDER ══════════ -->
+<div class="app-header">
+  <h1>Nobody Fucking Move</h1>
+  <p>Build the Bag</p>
+</div>
+
+<div class="player-count">
+  <h2>Player Count</h2>
+  <div class="count-buttons">
+    <button class="count-btn active" data-count="5" onclick="setCount(5)">5 Players</button>
+    <button class="count-btn" data-count="6" onclick="setCount(6)">6 Players</button>
+  </div>
+</div>
+
+<div class="sentinel-toggle">
+  <div class="sentinel-text">
+    <label for="sentinelToggle">Sentinel in play</label>
+    <p>Allows ±1 Outsider swap</p>
+  </div>
+  <label class="toggle-switch">
+    <input type="checkbox" id="sentinelToggle" onchange="render()">
+    <span class="toggle-track"></span>
+  </label>
+</div>
+
+<div class="section">
+  <div class="section-header">
+    <span class="section-label label-townsfolk">Townsfolk</span>
+    <span id="tfCount" class="count-townsfolk"></span>
+  </div>
+  <div id="townsfolkList"></div>
+</div>
+<div class="section">
+  <div class="section-header">
+    <span class="section-label label-outsider">Outsiders</span>
+    <span id="outCount" class="count-outsider"></span>
+  </div>
+  <div id="outsiderList"></div>
+</div>
+<div class="section">
+  <div class="section-header">
+    <span class="section-label label-minion">Minions</span>
+    <span id="minCount" class="count-minion"></span>
+  </div>
+  <div id="minionList"></div>
+</div>
+<div class="section">
+  <div class="section-header">
+    <span class="section-label label-demon">Demons</span>
+    <span id="demCount" class="count-demon"></span>
+  </div>
+  <div id="demonList"></div>
+</div>
+
+<div class="bottom-bar">
+  <button class="btn-random" onclick="randomize()">🎲 Randomize</button>
+  <button class="btn-dark" id="drawBtn" disabled onclick="startDraw()">Draw Tokens →</button>
+</div>
+
+<!-- ══════════ OVERLAY ══════════ -->
+<div id="overlay">
+
+  <!-- 1. Tap to reveal -->
+  <div id="revealScreen" onclick="showRole()">
+    <div id="revealProgress"></div>
+    <div id="revealHint">Tap to reveal role</div>
+    <div id="revealSub">Hand the phone to the next player</div>
+  </div>
+
+  <!-- 2. Role + name -->
+  <div id="roleScreen">
+    <div id="roleProgress"></div>
+    <div id="roleTypeBadge"></div>
+    <div id="roleName"></div>
+    <div id="roleAbility"></div>
+    <input id="nameInput" type="text" placeholder="Enter player name…" autocomplete="off"
+           oninput="document.getElementById('nameConfirm').disabled=!this.value.trim()">
+    <button id="nameConfirm" disabled onclick="confirmName()">Done →</button>
+  </div>
+
+  <!-- 3. Summary / players & roles -->
+  <div id="summaryScreen">
+    <div class="app-header">
+      <h1>Players &amp; Roles</h1>
+      <p>Nobody Fucking Move</p>
+    </div>
+    <div id="summaryContent"></div>
+    <div class="summary-actions">
+      <button class="btn-dark" id="runNightBtn" onclick="startOrResumeNight()">▶ Run Night Order</button>
+      <button class="btn-outline" onclick="restartBag()">← Build New Bag</button>
+    </div>
+  </div>
+
+  <!-- 4. Night order -->
+  <div id="nightScreen">
+    <div class="app-header">
+      <h1 id="nightTitle">First Night Order</h1>
+      <p>Nobody Fucking Move</p>
+    </div>
+    <div class="night-list" id="nightList"></div>
+    <div class="summary-actions">
+      <button class="btn-dark" id="endNightBtn" onclick="endNight()">End Night →</button>
+      <button class="btn-outline" onclick="showScreen('summaryScreen')">← Players &amp; Roles</button>
+    </div>
+  </div>
+
+  <!-- 5. Night card (full-screen prompt shown to player) -->
+  <div id="nightCardScreen" onclick="dismissNightCard()">
+    <div id="nightCardText"></div>
+    <div id="nightCardSub">Tap to dismiss</div>
+  </div>
+
+  <!-- 6. Philosopher picker -->
+  <div id="philoScreen">
+    <div class="app-header">
+      <h1>Philosopher</h1>
+      <p>Choose a character to become?</p>
+    </div>
+    <div class="philo-body" id="philoList"></div>
+    <div class="philo-footer">
+      <button class="btn-outline" onclick="philoSkip()">Skip — no choice made</button>
+    </div>
+  </div>
+
+  <!-- 7. Alchemist — ST assigns real ability -->
+  <div id="alchemistScreen">
+    <div class="app-header">
+      <h1>Alchemist</h1>
+      <p id="alchemistScreenSub">Assign the Alchemist's Minion ability</p>
+    </div>
+    <div class="philo-body" id="alchemistList"></div>
+  </div>
+
+  <!-- 8. Alchemist — ST picks false ability to show (Vortox) -->
+  <div id="alchemistFalseScreen">
+    <div class="app-header" style="background:#7e22ce">
+      <h1>Vortox Active</h1>
+      <p>Show the Alchemist a FALSE ability</p>
+    </div>
+    <div class="philo-body" id="alchemistFalseList"></div>
+    <div style="padding:0 0.75rem 0.5rem;font-size:0.78rem;color:#888;text-align:center" id="alchemistFalseNote"></div>
+  </div>
+
+  <!-- 9. Snake Charmer — player picker -->
+  <div id="snakeCharmerScreen">
+    <div class="app-header">
+      <h1>Snake Charmer</h1>
+      <p>Which player did they choose?</p>
+    </div>
+    <div class="philo-body" id="snakeCharmerList"></div>
+    <div class="philo-footer">
+      <button class="btn-outline" onclick="snakeCharmerNoSwap()">Not the Demon — no swap</button>
+    </div>
+  </div>
+
+  <!-- 10. Snake Charmer swap notification cards -->
+  <div id="scSwapScreen" style="background:#111">
+    <div class="app-header" style="background:#111">
+      <h1 id="scSwapTitle" style="color:#fff">Swap!</h1>
+      <p style="color:#555" id="scSwapSub"></p>
+    </div>
+    <div style="padding:1rem 0.75rem;flex:1;display:flex;flex-direction:column;gap:0.75rem" id="scSwapCards"></div>
+    <div style="padding:0 0.75rem 1.5rem">
+      <button id="scSwapDoneBtn" class="btn-outline" style="display:none" onclick="scSwapDone()">Done → Continue Night Order</button>
+    </div>
+  </div>
+
+  <!-- 11. Pukka — player picker -->
+  <div id="pukkaScreen">
+    <div class="app-header">
+      <h1>Pukka</h1>
+      <p id="pukkaScreenSub">Choose a player to poison</p>
+    </div>
+    <div class="philo-body" id="pukkaList"></div>
+  </div>
+
+  <!-- 12. Vortox — player picker -->
+  <div id="vortoxScreen">
+    <div class="app-header">
+      <h1>Vortox</h1>
+      <p>Choose a player to kill</p>
+    </div>
+    <div class="philo-body" id="vortoxList"></div>
+  </div>
+
+  <!-- 13. Player action screen -->
+  <div id="playerActionScreen">
+    <div class="app-header">
+      <h1 id="playerActionName"></h1>
+      <p id="playerActionRole"></p>
+    </div>
+    <div style="padding:1rem 0.75rem;display:flex;flex-direction:column;gap:0.75rem">
+      <button id="playerActionDeadBtn" class="btn-dark" onclick="togglePlayerDead()"></button>
+      <button class="btn-outline" onclick="showScreen('summaryScreen')">Cancel</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════
+// DATA
+// ══════════════════════════════
+const ROLES = {
+  townsfolk: [
+    { id: 'snakecharmer', name: 'Snake Charmer', ability: 'Each night, choose an alive player: a chosen Demon swaps characters & alignments with you & is then poisoned.' },
+    { id: 'alsaahir',     name: 'Alsaahir',      ability: 'Once per day, if you publicly guess which players are Minion(s) and which are Demon(s), good wins.' },
+    { id: 'slayer',       name: 'Slayer',         ability: 'Once per game, during the day, publicly choose a player. If they are the Demon, they die.' },
+    { id: 'philosopher',  name: 'Philosopher',    ability: 'Once per game, at night, choose a good character: gain that ability. If this character is in play, they are drunk.' },
+    { id: 'alchemist',    name: 'Alchemist',      ability: 'You have a Minion ability. When using this, the Storyteller may prompt you to choose differently.' },
+    { id: 'virgin',       name: 'Virgin',         ability: 'The 1st time you are nominated, if the nominator is a Townsfolk, they are executed immediately.' },
+  ],
+  outsider: [
+    { id: 'heretic', name: 'Heretic', ability: 'Whoever wins, loses & whoever loses, wins, even if you are dead.' },
+    { id: 'damsel',  name: 'Damsel',  ability: 'All Minions know you are in play. If a Minion publicly guesses you (once), your team loses.' },
+    { id: 'klutz',   name: 'Klutz',   ability: 'When you learn that you died, publicly choose 1 alive player: if they are evil, your team loses.' },
+  ],
+  minion: [
+    { id: 'psychopath', name: 'Psychopath', ability: 'Each day, before nominations, you may publicly choose a player: they die. If executed, you only die if you lose roshambo.' },
+    { id: 'goblin',     name: 'Goblin',     ability: 'If you publicly claim to be the Goblin when nominated & are executed that day, your team wins.' },
+    { id: 'boomdandy',  name: 'Boomdandy',  ability: 'If you are executed, all but 3 players die. 1 minute later, the player with the most players pointing at them dies.' },
+  ],
+  demon: [
+    { id: 'pukka',  name: 'Pukka',  ability: 'Each night, choose a player: they are poisoned. The previously poisoned player dies then becomes healthy.' },
+    { id: 'vortox', name: 'Vortox', ability: 'Each night*, choose a player: they die. Townsfolk abilities yield false info. Each day, if no-one is executed, evil wins.' },
+  ],
+};
+
+// Night order definitions — id, what to show as night card text, note for ST
+const NIGHT_DEFS = {
+  first: [
+    { id: 'philosopher',  card: 'Choose a character to become?',         note: 'May choose a good character or pass.' },
+    { id: 'alchemist',    card: 'Show the Alchemist their Minion ability.', note: 'ST: reveal not-in-play Minion ability.' },
+    { id: 'snakecharmer', card: 'Point to a player.',                    note: 'If Demon, swap & poison.' },
+    { id: 'pukka',        card: 'Point to a player to poison.',          note: 'They are now poisoned.' },
+    { id: 'damsel',       card: 'There is a Damsel in play.',             note: 'Show to all Minions.' },
+  ],
+  other: [
+    { id: 'philosopher',  card: 'Choose a character to become?',         note: 'May choose a good character or pass.' },
+    { id: 'snakecharmer', card: 'Point to a player.',                    note: 'If Demon, swap & poison.' },
+    { id: 'pukka',        card: 'Point to a player to poison.',          note: 'Previously poisoned player dies.' },
+    { id: 'vortox',       card: 'Point to a player to kill.',            note: 'They die tonight.' },
+  ],
+};
+
+// ══════════════════════════════
+// BAG BUILDER STATE
+// ══════════════════════════════
+let playerCount    = 5;
+let tfSelected     = new Set();
+let outSelected    = new Set();
+let selectedMinion = null;
+let selectedDemon  = null;
+
+// ══════════════════════════════
+// DRAW STATE
+// ══════════════════════════════
+let drawQueue   = [];
+let drawIndex   = 0;
+let assignments = []; // {id, name, type, player, poisoned}
+
+// ══════════════════════════════
+// NIGHT ORDER STATE
+// ══════════════════════════════
+let nightOrder     = [];  // array of night step objects built from in-play roles
+let nightStepIndex = 0;
+let philoCallback  = null; // called when philosopher picks or skips
+let currentNight   = 'first'; // 'first' or 'other'
+let nightNumber    = 1;
+
+// ══════════════════════════════
+// SCREEN MANAGEMENT
+// ══════════════════════════════
+function showScreen(id) {
+  ['revealScreen','roleScreen','summaryScreen','nightScreen','nightCardScreen','philoScreen','alchemistScreen','alchemistFalseScreen','snakeCharmerScreen','scSwapScreen','pukkaScreen','vortoxScreen','playerActionScreen']
+    .forEach(s => {
+      const el = document.getElementById(s);
+      el.style.display = 'none';
+    });
+  const target = document.getElementById(id);
+  const flexScreens = ['nightCardScreen','philoScreen','alchemistScreen','alchemistFalseScreen','snakeCharmerScreen','scSwapScreen','pukkaScreen','vortoxScreen','playerActionScreen'];
+  target.style.display = flexScreens.includes(id) ? 'flex' : 'block';
+  if (id === 'revealScreen') target.style.display = 'flex';
+  if (id === 'roleScreen')   target.style.display = 'flex';
+}
+
+// ══════════════════════════════
+// BAG BUILDER
+// ══════════════════════════════
+function setCount(n) {
+  playerCount = n;
+  document.querySelectorAll('.count-btn').forEach(b => b.classList.toggle('active', +b.dataset.count === n));
+  tfSelected.clear(); outSelected.clear(); selectedMinion = null; selectedDemon = null;
+  render();
+}
+
+function targets() {
+  return { townsfolk: 3, outsider: playerCount === 6 ? 1 : 0, minion: 1, demon: 1 };
+}
+
+function cur() {
+  return { townsfolk: tfSelected.size, outsider: outSelected.size, minion: selectedMinion ? 1 : 0, demon: selectedDemon ? 1 : 0 };
+}
+
+function total() { const c = cur(); return c.townsfolk + c.outsider + c.minion + c.demon; }
+function sentinel() { return document.getElementById('sentinelToggle').checked; }
+
+function render() {
+  const tgt = targets(), c = cur(), tot = total(), sent = sentinel();
+  const tfMax = sent ? tgt.townsfolk + 1 : tgt.townsfolk;
+  const outMax = sent ? tgt.outsider + 1 : tgt.outsider;
+
+  const upd = (id, val, tgt, cls) => {
+    const el = document.getElementById(id);
+    el.textContent = `${val}/${tgt}`;
+    el.className = val > tgt ? 'count-over' : cls;
+  };
+  upd('tfCount',  c.townsfolk, tgt.townsfolk, 'count-townsfolk');
+  upd('outCount', c.outsider,  tgt.outsider,  'count-outsider');
+  upd('minCount', c.minion,    tgt.minion,    'count-minion');
+  upd('demCount', c.demon,     tgt.demon,     'count-demon');
+
+  const mkCard = (r, type, sel, dimmed, fn) =>
+    `<div class="role-card ${type} ${sel?'selected':''} ${dimmed?'dimmed':''}" onclick="${fn}">
+      <div class="role-name">${r.name}</div>
+      <div class="role-ability">${r.ability}</div>
+    </div>`;
+
+  document.getElementById('townsfolkList').innerHTML = ROLES.townsfolk.map(r => {
+    const sel = tfSelected.has(r.id);
+    return mkCard(r, 'townsfolk', sel, !sel && !(tot < playerCount && c.townsfolk < tfMax), `toggleTF('${r.id}')`);
+  }).join('');
+
+  document.getElementById('outsiderList').innerHTML = ROLES.outsider.map(r => {
+    const sel = outSelected.has(r.id);
+    return mkCard(r, 'outsider', sel, !sel && !(tot < playerCount && c.outsider < outMax), `toggleOut('${r.id}')`);
+  }).join('');
+
+  document.getElementById('minionList').innerHTML = ROLES.minion.map(r => {
+    const sel = selectedMinion === r.id;
+    return mkCard(r, 'minion', sel, !sel && !!selectedMinion, `toggleMinion('${r.id}')`);
+  }).join('');
+
+  document.getElementById('demonList').innerHTML = ROLES.demon.map(r => {
+    const sel = selectedDemon === r.id;
+    return mkCard(r, 'demon', sel, !sel && !!selectedDemon, `toggleDemon('${r.id}')`);
+  }).join('');
+
+  const valid = sent
+    ? c.minion === 1 && c.demon === 1 && tot === playerCount
+    : c.townsfolk === tgt.townsfolk && c.outsider === tgt.outsider && c.minion === 1 && c.demon === 1;
+  document.getElementById('drawBtn').disabled = !valid;
+}
+
+function toggleTF(id) {
+  if (tfSelected.has(id)) tfSelected.delete(id);
+  else { const tgt=targets(),sent=sentinel(); if (total()<playerCount && tfSelected.size<(sent?tgt.townsfolk+1:tgt.townsfolk)) tfSelected.add(id); }
+  render();
+}
+function toggleOut(id) {
+  if (outSelected.has(id)) outSelected.delete(id);
+  else { const tgt=targets(),sent=sentinel(); if (total()<playerCount && outSelected.size<(sent?tgt.outsider+1:tgt.outsider)) outSelected.add(id); }
+  render();
+}
+function toggleMinion(id) { selectedMinion = selectedMinion===id ? null : id; render(); }
+function toggleDemon(id)  { selectedDemon  = selectedDemon===id  ? null : id; render(); }
+
+function randomize() {
+  const tgt=targets(), sent=sentinel();
+  tfSelected.clear(); outSelected.clear(); selectedMinion=null; selectedDemon=null;
+  let tfT=tgt.townsfolk, outT=tgt.outsider;
+  if (sent) { const r=Math.random(); if (r<0.33&&outT>0){outT++;tfT--;} else if(r<0.66){tfT++;outT=Math.max(0,outT-1);} }
+  [...ROLES.townsfolk].sort(()=>Math.random()-0.5).slice(0,tfT).forEach(r=>tfSelected.add(r.id));
+  [...ROLES.outsider ].sort(()=>Math.random()-0.5).slice(0,outT).forEach(r=>outSelected.add(r.id));
+  selectedMinion = ROLES.minion[Math.floor(Math.random()*ROLES.minion.length)].id;
+  selectedDemon  = ROLES.demon [Math.floor(Math.random()*ROLES.demon.length)].id;
+  render();
+}
+
+// ══════════════════════════════
+// DRAW TOKENS
+// ══════════════════════════════
+function startDraw() {
+  const bag = [];
+  ROLES.townsfolk.forEach(r => { if (tfSelected.has(r.id))    bag.push({...r, type:'townsfolk'}); });
+  ROLES.outsider .forEach(r => { if (outSelected.has(r.id))   bag.push({...r, type:'outsider'}); });
+  ROLES.minion   .forEach(r => { if (r.id===selectedMinion)   bag.push({...r, type:'minion'}); });
+  ROLES.demon    .forEach(r => { if (r.id===selectedDemon)    bag.push({...r, type:'demon'}); });
+  drawQueue = bag.sort(()=>Math.random()-0.5);
+  drawIndex = 0; assignments = [];
+  document.getElementById('overlay').style.display = 'block';
+  showRevealScreen();
+}
+
+function showRevealScreen() {
+  showScreen('revealScreen');
+  document.getElementById('revealProgress').textContent = `Player ${drawIndex+1} of ${drawQueue.length}`;
+}
+
+function showRole() {
+  const role = drawQueue[drawIndex];
+  showScreen('roleScreen');
+  const rs = document.getElementById('roleScreen');
+  rs.className = role.type;
+  document.getElementById('roleProgress').textContent  = `Player ${drawIndex+1} of ${drawQueue.length}`;
+  document.getElementById('roleTypeBadge').textContent = role.type.charAt(0).toUpperCase()+role.type.slice(1);
+  document.getElementById('roleTypeBadge').className   = `badge-${role.type}`;
+  document.getElementById('roleName').textContent      = role.name;
+  document.getElementById('roleAbility').textContent   = role.ability;
+  document.getElementById('nameInput').value           = '';
+  document.getElementById('nameConfirm').disabled      = true;
+  setTimeout(()=>document.getElementById('nameInput').focus(), 300);
+}
+
+function confirmName() {
+  const name = document.getElementById('nameInput').value.trim();
+  if (!name) return;
+  assignments.push({...drawQueue[drawIndex], player: name, poisoned: false});
+  drawIndex++;
+  if (drawIndex >= drawQueue.length) showSummary();
+  else showRevealScreen();
+}
+
+document.getElementById('nameInput').addEventListener('keydown', e => {
+  if (e.key==='Enter') { e.preventDefault(); if (!document.getElementById('nameConfirm').disabled) confirmName(); }
+});
+
+// ══════════════════════════════
+// SUMMARY
+// ══════════════════════════════
+function showSummary() {
+  showScreen('summaryScreen');
+  const order = ['townsfolk','outsider','minion','demon'];
+  const groups = {}; order.forEach(t=>groups[t]=[]);
+  assignments.forEach(a=>groups[a.type].push(a));
+  const labelMap = {townsfolk:'Townsfolk',outsider:'Outsiders',minion:'Minions',demon:'Demon'};
+  let html = '';
+  order.forEach(type => {
+    if (!groups[type].length) return;
+    html += `<div class="summary-section"><span class="summary-label label-${type}">${labelMap[type]}</span>`;
+    groups[type].forEach(a => {
+      let displayName = a.name;
+      let note = '';
+      if (a.id === 'philosopher' && a.philoChoice) {
+        displayName = a.philoChoice.name;
+        note = ' <span class="tag tag-philo" style="margin-left:0.4rem">via Philosopher</span>';
+      } else if (a.id === 'alchemist' && a.alchAbility) {
+        displayName = a.alchAbility.name + ' ability';
+        note = ' <span class="tag tag-philo" style="margin-left:0.4rem">Alchemist</span>';
+      }
+      const poisonTag = a.poisoned ? ' <span class="tag tag-poison" style="margin-left:0.4rem">Poisoned</span>' : '';
+      const pukkaTag = a.pukkaTarget === 'poisoned' ? ' <span class="tag tag-poison" style="margin-left:0.4rem">Pukka Poisoned</span>'
+                     : a.pukkaTarget === 'dies'     ? ' <span class="tag tag-dies" style="margin-left:0.4rem">Dies Tonight</span>' : '';
+      html += `<div class="player-card ${type} ${a.dead ? 'dead' : ''}" onclick="openPlayerAction('${a.player}')" style="cursor:pointer">
+        <div class="player-role">${displayName}${note}${poisonTag}${pukkaTag}${a.dead ? ' <span class=\"tag tag-dead\">Dead</span>' : ''}</div>
+        <div class="player-name">${a.player}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('summaryContent').innerHTML = html;
+}
+
+function restartBag() {
+  document.getElementById('overlay').style.display = 'none';
+  tfSelected.clear(); outSelected.clear(); selectedMinion=null; selectedDemon=null;
+  render();
+}
+
+// ══════════════════════════════
+// NIGHT ORDER
+// ══════════════════════════════
+function inPlayIds() {
+  const ids = new Set();
+  assignments.forEach(a => ids.add(a.id));
+  return ids;
+}
+
+function assignmentFor(id) {
+  return assignments.find(a => a.id === id) || null;
+}
+
+function buildNightOrder(which) {
+  const defs = NIGHT_DEFS[which];
+  const inPlay = inPlayIds();
+  const order = [];
+  defs.forEach(def => {
+    if (inPlay.has(def.id)) {
+      const a = assignmentFor(def.id);
+      order.push({ ...def, playerName: a ? a.player : '?', done: false });
+    }
+  });
+  return order;
+}
+
+function startNightOrder() {
+  nightOrder = buildNightOrder('first');
+  nightStepIndex = 0;
+  currentNight = 'first';
+  nightNumber = 1;
+  renderNightScreen('Night 1');
+  showScreen('nightScreen');
+}
+
+function startOrResumeNight() {
+  if (nightOrder.length === 0) {
+    startNightOrder();
+  } else {
+    renderNightScreen(document.getElementById('nightTitle').textContent);
+    showScreen('nightScreen');
+  }
+}
+
+function renderNightScreen(title) {
+  document.getElementById('nightTitle').textContent = title;
+  document.getElementById('nightList').innerHTML = nightOrder.map((step, i) => {
+    let statusTag = '';
+    if (step.removedDead) statusTag = '<span class="tag tag-dead">Dead</span>';
+    else if (step.done)   statusTag = '<span class="tag tag-done">Done</span>';
+    else if (i===nightStepIndex) statusTag = '<span class="tag tag-active">Now</span>';
+    else                  statusTag = '<span class="tag tag-pending">Pending</span>';
+
+    let extraTags = '';
+    if (step.id === 'philosopher') {
+      const philo = assignments.find(a=>a.id==='philosopher');
+      if (philo && philo.philoChoice) {
+        extraTags += `<span class="tag tag-philo">→ ${philo.philoChoice.name}</span>`;
+      }
+    }
+
+    const clickable = (step.done || i === nightStepIndex) && !step.removedDead;
+    return `<div class="night-card ${step.done?'done':''} ${step.removedDead?'done':''} ${i===nightStepIndex&&!step.done&&!step.removedDead?'active':''}"
+                 onclick="${clickable ? `nightCardTap(${i})` : ''}">
+      <div class="night-card-header">
+        <div class="night-card-left">
+          <span class="night-card-name">${step.playerName}</span>
+          <span class="night-card-player">${step.id==='philosopher'&&assignments.find(a=>a.id==='philosopher')?.philoChoice ? '' : ''}</span>
+          ${extraTags}
+        </div>
+        <div>${statusTag}</div>
+      </div>
+      <div class="night-card-note">${step.note}</div>
+    </div>`;
+  }).join('');
+}
+
+function nightCardTap(i) {
+  const step = nightOrder[i];
+  if (!step) return;
+
+  // If already done, re-open the relevant flow for alchemist/snakecharmer,
+  // or just re-show the night card for everything else
+  if (step.done) {
+    if (step.id === 'alchemist') {
+      // Re-show the alchemist night card with the ability they were given
+      const alch = assignments.find(a => a.id === 'alchemist');
+      const shownAbility = alch && alch.alchShown ? alch.alchShown : null;
+      if (shownAbility) {
+        document.getElementById('nightCardText').textContent = `You have the ${shownAbility.name} ability.`;
+        document.getElementById('nightCardSub').textContent  = shownAbility.ability + ' — Tap to dismiss';
+        showScreen('nightCardScreen');
+        philoCallback = () => {
+          document.getElementById('nightCardSub').textContent = 'Tap to dismiss';
+          showScreen('nightScreen');
+        };
+      } else {
+        showScreen('nightScreen');
+      }
+    } else if (step.id === 'snakecharmer') {
+      // Re-open the snake charmer picker so ST can re-show cards
+      showSnakeCharmerPicker(i);
+    } else if (step.id === 'pukka') {
+      showPukkaPicker(i);
+    } else if (step.id === 'vortox') {
+      showVortoxPicker(i);
+    } else {
+      document.getElementById('nightCardText').textContent = step.card;
+      showScreen('nightCardScreen');
+      philoCallback = () => { showScreen('nightScreen'); };
+    }
+    return;
+  }
+
+  if (step.id === 'philosopher') {
+    const philoA = assignments.find(a => a.id === 'philosopher');
+    const philoPoisoned = philoA && (philoA.poisoned || philoA.pukkaTarget === 'poisoned');
+    if (philoPoisoned) {
+      document.getElementById('nightCardText').textContent = step.card;
+      showScreen('nightCardScreen');
+      philoCallback = () => {
+        nightOrder[i].done = true;
+        nightStepIndex = nightOrder.findIndex(s => !s.done && !s.removedDead);
+        if (nightStepIndex === -1) nightStepIndex = nightOrder.length;
+        renderNightScreen(document.getElementById('nightTitle').textContent);
+        showScreen('nightScreen');
+      };
+    } else {
+      showPhiloPicker(i);
+    }
+  } else if (step.id === 'alchemist') {
+    showAlchemistPicker(i);
+  } else if (step.id === 'snakecharmer') {
+    // Show night card to player first
+    document.getElementById('nightCardText').textContent = step.card;
+    showScreen('nightCardScreen');
+    const scA = assignments.find(a => a.id === 'snakecharmer');
+    const scPoisoned = scA && (scA.poisoned || scA.pukkaTarget === 'poisoned');
+    philoCallback = () => {
+      if (scPoisoned) {
+        // Poisoned — ability has no effect, just mark done
+        nightOrder[i].done = true;
+        nightStepIndex = nightOrder.findIndex(s => !s.done && !s.removedDead);
+        if (nightStepIndex === -1) nightStepIndex = nightOrder.length;
+        renderNightScreen(document.getElementById('nightTitle').textContent);
+        showScreen('nightScreen');
+      } else {
+        showSnakeCharmerPicker(i);
+      }
+    };
+  } else if (step.id === 'pukka') {
+    // Show night card to player first, then ST picks who is poisoned
+    document.getElementById('nightCardText').textContent = step.card;
+    showScreen('nightCardScreen');
+    philoCallback = () => showPukkaPicker(i);
+  } else if (step.id === 'vortox') {
+    document.getElementById('nightCardText').textContent = step.card;
+    showScreen('nightCardScreen');
+    philoCallback = () => showVortoxPicker(i);
+  } else {
+    // For Damsel, skip if poisoned
+    if (step.id === 'damsel') {
+      const damsel = assignments.find(a => a.id === 'damsel');
+      if (damsel && damsel.poisoned) {
+        nightOrder[i].done = true;
+        nightStepIndex = nightOrder.findIndex(s=>!s.done);
+        if (nightStepIndex === -1) nightStepIndex = nightOrder.length;
+        renderNightScreen('First Night Order');
+        showScreen('nightScreen');
+        return;
+      }
+    }
+    // Show the night card, then mark done on dismiss
+    document.getElementById('nightCardText').textContent = step.card;
+    showScreen('nightCardScreen');
+    philoCallback = () => {
+      nightOrder[i].done = true;
+      nightStepIndex = nightOrder.findIndex(s=>!s.done);
+      if (nightStepIndex === -1) nightStepIndex = nightOrder.length;
+      renderNightScreen('First Night Order');
+      showScreen('nightScreen');
+    };
+  }
+}
+
+function dismissNightCard() {
+  showScreen('nightScreen');
+  if (philoCallback) { philoCallback(); philoCallback = null; }
+}
+
+// ── Philosopher ──
+function showPhiloPicker(stepIndex) {
+  const inPlay = inPlayIds();
+  const allGood = [
+    ...ROLES.townsfolk.map(r=>({...r,type:'townsfolk'})),
+    ...ROLES.outsider .map(r=>({...r,type:'outsider'})),
+  ];
+
+  document.getElementById('philoList').innerHTML = allGood.map(r => {
+    return `<div class="philo-option ${r.type}" onclick="philoPick('${r.id}', ${stepIndex})">
+      <div class="philo-option-name">${r.name}${inPlay.has(r.id)?' <span class="tag tag-poison">In play — will be poisoned</span>':''}</div>
+      <div class="philo-option-ability">${r.ability}</div>
+    </div>`;
+  }).join('');
+
+  // Show night card first, then on dismiss open picker
+  document.getElementById('nightCardText').textContent = nightOrder[stepIndex].card;
+  showScreen('nightCardScreen');
+  philoCallback = () => showScreen('philoScreen');
+}
+
+function philoPick(roleId, stepIndex) {
+  const allGood = [...ROLES.townsfolk, ...ROLES.outsider];
+  const chosen = allGood.find(r=>r.id===roleId);
+  if (!chosen) return;
+
+  // Record the choice on the philosopher assignment
+  const philo = assignments.find(a=>a.id==='philosopher');
+  if (philo) philo.philoChoice = chosen;
+
+  // If chosen role is already in play, mark that player as poisoned
+  const inPlay = inPlayIds();
+  if (inPlay.has(roleId)) {
+    const existing = assignments.find(a=>a.id===roleId);
+    if (existing) existing.poisoned = true;
+  }
+
+  // Remove the philosopher step from the night order entirely
+  nightOrder.splice(stepIndex, 1);
+
+  // Find the correct insertion point based on NIGHT_DEFS order
+  const defsOrder = NIGHT_DEFS.first.map(d=>d.id);
+  const chosenDef = NIGHT_DEFS.first.find(d=>d.id===roleId);
+  if (chosenDef) {
+    const philoA = assignments.find(a=>a.id==='philosopher');
+    const newStep = { ...chosenDef, playerName: philoA ? philoA.player : '?', done: false, isPhiloProxy: true };
+    // Only insert if this role isn't already in the order
+    const alreadyThere = nightOrder.find(s=>s.id===roleId&&!s.isPhiloProxy);
+    if (!alreadyThere) {
+      const chosenDefIndex = defsOrder.indexOf(roleId);
+      let insertAt = nightOrder.length;
+      for (let i=0; i<nightOrder.length; i++) {
+        const stepDefIndex = defsOrder.indexOf(nightOrder[i].id);
+        if (stepDefIndex > chosenDefIndex) { insertAt = i; break; }
+      }
+      nightOrder.splice(insertAt, 0, newStep);
+    }
+  }
+
+  // Recalculate current step
+  nightStepIndex = nightOrder.findIndex(s=>!s.done);
+  if (nightStepIndex===-1) nightStepIndex = nightOrder.length;
+
+  showSummary();
+  renderNightScreen('First Night Order');
+  showScreen('nightScreen');
+}
+
+function philoSkip(stepIndex) {
+  // Just mark done without choosing
+  const i = nightOrder.findIndex(s=>s.id==='philosopher'&&!s.done);
+  if (i>=0) {
+    nightOrder[i].done = true;
+    nightStepIndex = nightOrder.findIndex(s=>!s.done);
+    if (nightStepIndex===-1) nightStepIndex = nightOrder.length;
+    renderNightScreen('First Night Order');
+  }
+  showScreen('nightScreen');
+}
+
+// ══════════════════════════════
+// ALCHEMIST
+// ══════════════════════════════
+let alchemistStepIndex = -1;
+let alchemistRealId    = null;
+
+function showAlchemistPicker(stepIndex) {
+  alchemistStepIndex = stepIndex;
+  alchemistRealId = null;
+  document.getElementById('alchemistScreenSub').textContent = "Assign the Alchemist's Minion ability (ST only)";
+  document.getElementById('alchemistList').innerHTML = ROLES.minion.map(r =>
+    `<div class="philo-option minion" onclick="alchemistPickReal('${r.id}')">
+      <div class="philo-option-name">${r.name}</div>
+      <div class="philo-option-ability">${r.ability}</div>
+    </div>`
+  ).join('');
+  showScreen('alchemistScreen');
+}
+
+function alchemistPickReal(roleId) {
+  alchemistRealId = roleId;
+  const realRole = ROLES.minion.find(r=>r.id===roleId);
+
+  // Record on assignment
+  const alch = assignments.find(a=>a.id==='alchemist');
+  if (alch) alch.alchAbility = realRole;
+
+  const vortoxInPlay = assignments.some(a=>a.id==='vortox');
+
+  if (vortoxInPlay) {
+    // ST must now pick a DIFFERENT (false) ability to show the player
+    const falseOptions = ROLES.minion.filter(r=>r.id!==roleId);
+    document.getElementById('alchemistFalseNote').textContent =
+      `Real ability: ${realRole.name} — Vortox is in play, so the Alchemist must receive false info. Choose a different ability to show them.`;
+    document.getElementById('alchemistFalseList').innerHTML = falseOptions.map(r =>
+      `<div class="philo-option minion" onclick="alchemistPickFalse('${r.id}')">
+        <div class="philo-option-name">${r.name}</div>
+        <div class="philo-option-ability">${r.ability}</div>
+      </div>`
+    ).join('');
+    showScreen('alchemistFalseScreen');
+  } else {
+    // No Vortox — show the real ability on the night card
+    showAlchemistNightCard(realRole, alchemistStepIndex);
+  }
+}
+
+function alchemistPickFalse(roleId) {
+  const falseRole = ROLES.minion.find(r=>r.id===roleId);
+  showAlchemistNightCard(falseRole, alchemistStepIndex);
+}
+
+function showAlchemistNightCard(shownRole, stepIndex) {
+  // Store what was shown so we can re-display it
+  const alch = assignments.find(a => a.id === 'alchemist');
+  if (alch) alch.alchShown = shownRole;
+  document.getElementById('nightCardText').textContent = `You have the ${shownRole.name} ability.`;
+  document.getElementById('nightCardSub').textContent  = shownRole.ability + ' — Tap to dismiss';
+  showScreen('nightCardScreen');
+  philoCallback = () => {
+    // Reset sub text
+    document.getElementById('nightCardSub').textContent = 'Tap to dismiss';
+    // Mark done
+    nightOrder[stepIndex].done = true;
+    nightStepIndex = nightOrder.findIndex(s=>!s.done);
+    if (nightStepIndex===-1) nightStepIndex = nightOrder.length;
+    showSummary();
+    renderNightScreen('First Night Order');
+    showScreen('nightScreen');
+  };
+}
+
+// ══════════════════════════════
+// SNAKE CHARMER
+// ══════════════════════════════
+let scStepIndex = -1;
+
+function showSnakeCharmerPicker(stepIndex) {
+  scStepIndex = stepIndex;
+
+  // Find the snake charmer player to exclude them
+  const scAssignment = assignments.find(a => a.id === 'snakecharmer');
+  const scPlayerName = scAssignment ? scAssignment.player : null;
+
+  // List all players except the snake charmer themselves
+  const options = assignments.filter(a => a.player !== scPlayerName);
+
+  document.getElementById('snakeCharmerList').innerHTML = options.map(a => {
+    const isDemon = (a.type === 'demon');
+    return `<div class="philo-option ${a.type}" onclick="scPlayerChosen('${a.player}')">
+      <div class="philo-option-name">${a.player}${isDemon ? ' <span class="tag tag-poison">Demon</span>' : ''}</div>
+      <div class="philo-option-ability">${a.name}</div>
+    </div>`;
+  }).join('');
+
+  showScreen('snakeCharmerScreen');
+}
+
+function scPlayerChosen(playerName) {
+  const chosen = assignments.find(a => a.player === playerName);
+  if (!chosen) return;
+
+  if (chosen.type !== 'demon') {
+    // Not the demon — no swap, just mark done
+    snakeCharmerNoSwap();
+    return;
+  }
+
+  // It IS the demon — perform the swap
+  const scAssignment  = assignments.find(a => a.id === 'snakecharmer');
+  const demAssignment = chosen;
+
+  const oldDemonId   = demAssignment.id;
+  const oldDemonName = demAssignment.name;
+  const oldDemonAbil = demAssignment.ability;
+  const oldDemonType = demAssignment.type;
+
+  const scRole = ROLES.townsfolk.find(r => r.id === 'snakecharmer');
+
+  // Swap roles: demon becomes poisoned snake charmer, snake charmer becomes the demon
+  demAssignment.id      = 'snakecharmer';
+  demAssignment.name    = 'Snake Charmer';
+  demAssignment.ability = scRole.ability;
+  demAssignment.type    = 'townsfolk';
+  demAssignment.poisoned = true;
+
+  scAssignment.id      = oldDemonId;
+  scAssignment.name    = oldDemonName;
+  scAssignment.ability = oldDemonAbil;
+  scAssignment.type    = oldDemonType;
+
+  // Update night order: find any demon steps and update playerName to new demon player
+  nightOrder.forEach(step => {
+    if (step.id === oldDemonId && step.playerName === demAssignment.player) {
+      step.playerName = scAssignment.player;
+    }
+    // The snake charmer step (done) now belongs to the poisoned new SC — update display name
+    if (step.id === 'snakecharmer' && step.playerName === scAssignment.player) {
+      step.playerName = demAssignment.player;
+    }
+  });
+
+  // Mark snake charmer step done
+  nightOrder[scStepIndex].done = true;
+  nightStepIndex = nightOrder.findIndex(s=>!s.done);
+  if (nightStepIndex === -1) nightStepIndex = nightOrder.length;
+
+  // Show swap notification cards
+  showScSwap(scAssignment, demAssignment, oldDemonName);
+}
+
+// Tracks which swap cards have been shown
+let scSwapShown = { sc: false, demon: false };
+let scSwapData  = {};
+
+function showScSwap(newDemon, newSC, demonRoleName) {
+  scSwapShown = { sc: false, demon: false };
+  scSwapData  = { newDemon, newSC, demonRoleName };
+  renderScSwapScreen();
+  showScreen('scSwapScreen');
+}
+
+function renderScSwapScreen() {
+  const { newDemon, newSC, demonRoleName } = scSwapData;
+  const allDone = scSwapShown.sc && scSwapShown.demon;
+  document.getElementById('scSwapTitle').textContent = 'Roles Swapped!';
+  document.getElementById('scSwapSub').textContent   = 'Tap each player to show them their new role';
+  document.getElementById('scSwapCards').innerHTML   = `
+    <div class="sc-swap-card good ${scSwapShown.sc ? 'sc-shown' : 'sc-unseen'}" onclick="scShowCard('sc')">
+      <div class="sc-player">${newSC.player}</div>
+      <div class="sc-role">Snake Charmer (Good)</div>
+      <div class="sc-note">${scSwapShown.sc ? '✓ Shown' : 'Tap to show night card'}</div>
+    </div>
+    <div class="sc-swap-card evil ${scSwapShown.demon ? 'sc-shown' : 'sc-unseen'}" onclick="scShowCard('demon')">
+      <div class="sc-player">${newDemon.player}</div>
+      <div class="sc-role">${demonRoleName} (Evil)</div>
+      <div class="sc-note">${scSwapShown.demon ? '✓ Shown' : 'Tap to show night card'}</div>
+    </div>`;
+
+  // Show Done button only once both have been shown
+  document.getElementById('scSwapDoneBtn').style.display = allDone ? 'block' : 'none';
+}
+
+function scShowCard(which) {
+  const { newDemon, newSC, demonRoleName } = scSwapData;
+  let text = '';
+  if (which === 'sc') {
+    text = 'You are the good Snake Charmer.';
+  } else {
+    text = `You are the evil ${demonRoleName}.`;
+  }
+  document.getElementById('nightCardText').textContent = text;
+  document.getElementById('nightCardSub').textContent  = 'Tap to dismiss';
+  showScreen('nightCardScreen');
+  philoCallback = () => {
+    scSwapShown[which] = true;
+    renderScSwapScreen();
+    showScreen('scSwapScreen');
+  };
+}
+
+function scSwapDone() {
+  showSummary();
+  renderNightScreen('First Night Order');
+  showScreen('nightScreen');
+}
+
+function snakeCharmerNoSwap() {
+  // Mark the snake charmer step done, no swap
+  if (scStepIndex >= 0) {
+    nightOrder[scStepIndex].done = true;
+    nightStepIndex = nightOrder.findIndex(s=>!s.done);
+    if (nightStepIndex === -1) nightStepIndex = nightOrder.length;
+    renderNightScreen('First Night Order');
+  }
+  showScreen('nightScreen');
+}
+
+// ══════════════════════════════
+// PUKKA
+// ══════════════════════════════
+let pukkaStepIndex = -1;
+
+function showPukkaPicker(stepIndex) {
+  pukkaStepIndex = stepIndex;
+
+  // Find current poisoned player and "dies tonight" player for display
+  const poisonedNow  = assignments.find(a => a.pukkaTarget === 'poisoned');
+  const diesTonight  = assignments.find(a => a.pukkaTarget === 'dies');
+
+  // Pukka cannot choose themselves
+  const pukkaA = assignments.find(a => a.id === 'pukka');
+  const pukkaPlayer = pukkaA ? pukkaA.player : null;
+
+  document.getElementById('pukkaScreenSub').textContent = 'Which player did the Pukka choose?';
+  document.getElementById('pukkaList').innerHTML = assignments
+    .filter(a => a.player !== pukkaPlayer)
+    .map(a => {
+      let tags = '';
+      if (a.pukkaTarget === 'poisoned') tags += ' <span class="tag tag-poison">Currently Poisoned</span>';
+      if (a.pukkaTarget === 'dies')     tags += ' <span class="tag tag-dies">Dies Tonight</span>';
+      return `<div class="philo-option ${a.type}" onclick="pukkaPickPlayer('${a.player}')">
+        <div class="philo-option-name">${a.player}${tags}</div>
+        <div class="philo-option-ability">${a.name}</div>
+      </div>`;
+    }).join('');
+
+  showScreen('pukkaScreen');
+}
+
+function pukkaPickPlayer(playerName) {
+  const prevDies = assignments.find(a => a.pukkaTarget === 'dies');
+
+  if (currentNight !== 'first' && prevDies) {
+    // Show ST a death confirmation card first, then apply state
+    document.getElementById('nightCardText').textContent = `${prevDies.player} dies tonight.`;
+    document.getElementById('nightCardSub').textContent  = 'Tap to confirm';
+    showScreen('nightCardScreen');
+    philoCallback = () => {
+      document.getElementById('nightCardSub').textContent = 'Tap to dismiss';
+      applyPukkaChoice(playerName);
+    };
+  } else {
+    applyPukkaChoice(playerName);
+  }
+}
+
+function applyPukkaChoice(playerName) {
+  // Advance pukka poison chain
+  assignments.forEach(a => {
+    if (a.pukkaTarget === 'dies') {
+      delete a.pukkaTarget;
+      a.dead = true;
+      nightOrder.forEach(step => {
+        if (step.playerName === a.player) step.removedDead = true;
+      });
+    } else if (a.pukkaTarget === 'poisoned') {
+      a.pukkaTarget = 'dies';
+    }
+  });
+
+  const chosen = assignments.find(a => a.player === playerName);
+  if (chosen) chosen.pukkaTarget = 'poisoned';
+
+  nightOrder[pukkaStepIndex].done = true;
+  nightStepIndex = nightOrder.findIndex(s => !s.done && !s.removedDead);
+  if (nightStepIndex === -1) nightStepIndex = nightOrder.length;
+
+  showSummary();
+  renderNightScreen(document.getElementById('nightTitle').textContent);
+  showScreen('nightScreen');
+}
+
+// ══════════════════════════════
+// PLAYER ACTIONS
+// ══════════════════════════════
+let actionPlayerName = null;
+
+function openPlayerAction(playerName) {
+  actionPlayerName = playerName;
+  const a = assignments.find(a => a.player === playerName);
+  if (!a) return;
+
+  const displayName = (a.id === 'philosopher' && a.philoChoice) ? a.philoChoice.name
+                    : (a.id === 'alchemist' && a.alchAbility)   ? a.alchAbility.name + ' ability'
+                    : a.name;
+
+  document.getElementById('playerActionName').textContent = playerName;
+  document.getElementById('playerActionRole').textContent = displayName;
+  document.getElementById('playerActionDeadBtn').textContent = a.dead ? 'Mark as Alive' : 'Mark as Dead';
+  showScreen('playerActionScreen');
+}
+
+function togglePlayerDead() {
+  const a = assignments.find(a => a.player === actionPlayerName);
+  if (!a) return;
+
+  a.dead = !a.dead;
+
+  // Update night order — remove from order if dead, restore if un-killed
+  nightOrder.forEach(step => {
+    if (step.playerName === actionPlayerName) {
+      step.removedDead = a.dead;
+    }
+  });
+
+  // Recalculate nightStepIndex skipping dead-removed steps
+  nightStepIndex = nightOrder.findIndex(s => !s.done && !s.removedDead);
+  if (nightStepIndex === -1) nightStepIndex = nightOrder.length;
+
+  showSummary();
+  showScreen('summaryScreen');
+}
+
+// ══════════════════════════════
+// END NIGHT / OTHER NIGHTS
+// ══════════════════════════════
+function endNight() {
+  currentNight = 'other';
+  nightNumber++;
+
+  // Build fresh other-night order, preserving dead removals
+  nightOrder = buildNightOrder('other');
+  nightStepIndex = nightOrder.findIndex(s => !s.done && !s.removedDead);
+  if (nightStepIndex === -1) nightStepIndex = nightOrder.length;
+
+  renderNightScreen(`Night ${nightNumber}`);
+  showSummary();
+  showScreen('summaryScreen');
+}
+
+// ══════════════════════════════
+// VORTOX
+// ══════════════════════════════
+let vortoxStepIndex = -1;
+
+function showVortoxPicker(stepIndex) {
+  vortoxStepIndex = stepIndex;
+  const vortoxA = assignments.find(a => a.id === 'vortox');
+  const vortoxPlayer = vortoxA ? vortoxA.player : null;
+
+  document.getElementById('vortoxList').innerHTML = assignments
+    .filter(a => a.player !== vortoxPlayer && !a.dead)
+    .map(a => `<div class="philo-option ${a.type}" onclick="vortoxKill('${a.player}')">
+      <div class="philo-option-name">${a.player}</div>
+      <div class="philo-option-ability">${a.name}</div>
+    </div>`).join('');
+
+  showScreen('vortoxScreen');
+}
+
+function vortoxKill(playerName) {
+  // Show ST a confirmation night card before marking dead
+  document.getElementById('nightCardText').textContent = `${playerName} dies tonight.`;
+  document.getElementById('nightCardSub').textContent  = 'Tap to confirm';
+  showScreen('nightCardScreen');
+  philoCallback = () => {
+    document.getElementById('nightCardSub').textContent = 'Tap to dismiss';
+    const a = assignments.find(a => a.player === playerName);
+    if (a) {
+      a.dead = true;
+      nightOrder.forEach(step => {
+        if (step.playerName === playerName) step.removedDead = true;
+      });
+    }
+    nightOrder[vortoxStepIndex].done = true;
+    nightStepIndex = nightOrder.findIndex(s => !s.done && !s.removedDead);
+    if (nightStepIndex === -1) nightStepIndex = nightOrder.length;
+    showSummary();
+    renderNightScreen(document.getElementById('nightTitle').textContent);
+    showScreen('nightScreen');
+  };
+}
+
+render();
+</script>
+</body>
+</html>
