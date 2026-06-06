@@ -1,0 +1,276 @@
+---
+layout: blog_layout.html
+title: photo fixer
+tags: multicontainer
+---
+<div class="container">
+    <h1>photo fixer</h1>
+    <p>Converts HEIC photos to JPG.</p>
+
+    <p>
+        <label for="heic-input" class="button small" style="display:inline-block; width:auto; cursor:pointer; border:1px solid currentColor;">
+            choose photos
+        </label>
+        <input id="heic-input" type="file" accept=".heic,.heif,image/heic,image/heif" multiple style="display:none;">
+    </p>
+
+    <p>
+        <label for="quality">quality: <span id="quality-label">90%</span></label><br>
+        <input id="quality" type="range" min="10" max="100" value="90" step="5" style="width:50%;">
+    </p>
+
+    <p id="status"></p>
+
+    <p id="actions" style="display:none;">
+        <button id="download-all" class="button small" style="width:auto; border:1px solid currentColor; cursor:pointer;">download all</button>
+    </p>
+
+    <div id="results"></div>
+</div>
+
+<div class="container">
+    <h1>resize</h1>
+    <p>Shrink photos to a max width or height. Aspect ratio is always kept.</p>
+
+    <p>
+        <label for="resize-input" class="button small" style="display:inline-block; width:auto; cursor:pointer; border:1px solid currentColor;">
+            choose photos
+        </label>
+        <input id="resize-input" type="file" accept="image/*" multiple style="display:none;">
+    </p>
+
+    <p>
+        <label for="resize-max">max size (px): </label>
+        <input id="resize-max" type="number" min="1" value="1600" style="width:100px;">
+        <span style="opacity:0.7;">longest side</span>
+    </p>
+
+    <p id="resize-status"></p>
+
+    <p id="resize-actions" style="display:none;">
+        <button id="resize-download-all" class="button small" style="width:auto; border:1px solid currentColor; cursor:pointer;">download all</button>
+    </p>
+
+    <div id="resize-results"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+<script>
+(function () {
+    const input = document.getElementById('heic-input');
+    const quality = document.getElementById('quality');
+    const qualityLabel = document.getElementById('quality-label');
+    const status = document.getElementById('status');
+    const results = document.getElementById('results');
+    const actions = document.getElementById('actions');
+    const downloadAll = document.getElementById('download-all');
+
+    // Track the JPG blobs we've produced so "download all" can re-use them.
+    let converted = [];
+
+    quality.addEventListener('input', () => {
+        qualityLabel.textContent = quality.value + '%';
+    });
+
+    function jpgName(name) {
+        return name.replace(/\.(heic|heif)$/i, '') + '.jpg';
+    }
+
+    function triggerDownload(blob, name) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        // Revoke a tick later so the download has time to start.
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function addResult(blob, name) {
+        const url = URL.createObjectURL(blob);
+
+        const wrap = document.createElement('div');
+        wrap.style.margin = '16px 0';
+
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = name;
+        img.style.maxWidth = '240px';
+        img.style.display = 'block';
+        img.style.marginBottom = '8px';
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = name;
+        link.textContent = 'download ' + name;
+
+        wrap.appendChild(img);
+        wrap.appendChild(link);
+        results.appendChild(wrap);
+    }
+
+    input.addEventListener('change', async () => {
+        const files = Array.from(input.files || []);
+        if (!files.length) return;
+
+        if (typeof heic2any === 'undefined') {
+            status.textContent = 'Converter failed to load — check your connection and refresh.';
+            return;
+        }
+
+        results.innerHTML = '';
+        converted = [];
+        actions.style.display = 'none';
+
+        const q = parseInt(quality.value, 10) / 100;
+        let done = 0;
+        let failed = 0;
+
+        for (const file of files) {
+            status.textContent = 'Converting ' + (done + 1) + ' of ' + files.length + '…';
+            try {
+                let out = await heic2any({ blob: file, toType: 'image/jpeg', quality: q });
+                // Multi-image HEIC (e.g. Live Photos) returns an array of blobs.
+                const blobs = Array.isArray(out) ? out : [out];
+                blobs.forEach((blob, i) => {
+                    const base = jpgName(file.name);
+                    const name = blobs.length > 1
+                        ? base.replace(/\.jpg$/i, '') + '_' + (i + 1) + '.jpg'
+                        : base;
+                    converted.push({ blob, name });
+                    addResult(blob, name);
+                });
+            } catch (err) {
+                failed++;
+                const note = document.createElement('p');
+                note.textContent = 'Could not convert ' + file.name + ' (' + (err && err.message ? err.message : 'unknown error') + ')';
+                results.appendChild(note);
+            }
+            done++;
+        }
+
+        let msg = 'Done — converted ' + converted.length + ' image' + (converted.length === 1 ? '' : 's') + '.';
+        if (failed) msg += ' ' + failed + ' file' + (failed === 1 ? '' : 's') + ' failed.';
+        status.textContent = msg;
+
+        if (converted.length) actions.style.display = '';
+    });
+
+    downloadAll.addEventListener('click', () => {
+        converted.forEach(({ blob, name }) => triggerDownload(blob, name));
+    });
+})();
+</script>
+
+<script>
+(function () {
+    const input = document.getElementById('resize-input');
+    const maxInput = document.getElementById('resize-max');
+    const status = document.getElementById('resize-status');
+    const results = document.getElementById('resize-results');
+    const actions = document.getElementById('resize-actions');
+    const downloadAll = document.getElementById('resize-download-all');
+
+    let resized = [];
+
+    function triggerDownload(blob, name) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function loadImage(file) {
+        return new Promise((resolve, reject) => {
+            const url = URL.createObjectURL(file);
+            const img = new Image();
+            img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+            img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('could not read image')); };
+            img.src = url;
+        });
+    }
+
+    function addResult(blob, name) {
+        const url = URL.createObjectURL(blob);
+        const wrap = document.createElement('div');
+        wrap.style.margin = '16px 0';
+
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = name;
+        img.style.maxWidth = '240px';
+        img.style.display = 'block';
+        img.style.marginBottom = '8px';
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = name;
+        link.textContent = 'download ' + name;
+
+        wrap.appendChild(img);
+        wrap.appendChild(link);
+        results.appendChild(wrap);
+    }
+
+    input.addEventListener('change', async () => {
+        const files = Array.from(input.files || []);
+        if (!files.length) return;
+
+        const max = parseInt(maxInput.value, 10);
+        if (!max || max < 1) {
+            status.textContent = 'Enter a valid max size first.';
+            return;
+        }
+
+        results.innerHTML = '';
+        resized = [];
+        actions.style.display = 'none';
+
+        let done = 0;
+        let failed = 0;
+
+        for (const file of files) {
+            status.textContent = 'Resizing ' + (done + 1) + ' of ' + files.length + '…';
+            try {
+                const img = await loadImage(file);
+                // Scale the longest side down to `max`; never upscale.
+                const scale = Math.min(1, max / Math.max(img.width, img.height));
+                const w = Math.round(img.width * scale);
+                const h = Math.round(img.height * scale);
+
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+
+                const blob = await new Promise((res) => canvas.toBlob(res, 'image/jpeg', 0.9));
+                const name = file.name;
+                resized.push({ blob, name });
+                addResult(blob, name);
+            } catch (err) {
+                failed++;
+                const note = document.createElement('p');
+                note.textContent = 'Could not resize ' + file.name + ' (' + (err && err.message ? err.message : 'unknown error') + ')';
+                results.appendChild(note);
+            }
+            done++;
+        }
+
+        let msg = 'Done — resized ' + resized.length + ' image' + (resized.length === 1 ? '' : 's') + '.';
+        if (failed) msg += ' ' + failed + ' file' + (failed === 1 ? '' : 's') + ' failed.';
+        status.textContent = msg;
+
+        if (resized.length) actions.style.display = '';
+    });
+
+    downloadAll.addEventListener('click', () => {
+        resized.forEach(({ blob, name }) => triggerDownload(blob, name));
+    });
+})();
+</script>
