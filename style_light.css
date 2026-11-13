@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
 
 :root {
-    --color-bg: #ffcc99;
+    --color-bg: #f1d292;
     --color-text: #1a1a1a;
-    --color-accent: #9999ff;
-    --color-surface: #fff7e6;
+    --color-accent: #866d95;
+    --color-surface: #f1edd0;
     --color-surface-alt: #ffffff;
     --color-input-bg: inherit;
     --color-input-text: inherit;
-    --color-review-header: #9999ff;
+    --color-review-header: #866d95  ;
     --color-banner-text-bg: rgba(255, 247, 230, 0.85);
 }
 

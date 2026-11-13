@@ -1,13 +1,13 @@
 :root {
-    --color-bg: #000063;
+    --color-bg: #4e3e59;
     --color-text: white;
-    --color-accent: #2e63b8;
-    --color-surface: #000033;
+    --color-accent: #91415a;
+    --color-surface: #39203f;
     --color-surface-alt: black;
     --color-input-bg: black;
     --color-input-text: white;
     --color-review-header: #330066;
-    --color-banner-text-bg: rgba(0, 0, 51, 0.85);
+    --color-banner-text-bg: #39203f;
 }
 
 img {
